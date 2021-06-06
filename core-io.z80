@@ -1,0 +1,178 @@
+;   PC!         ( uc p --  )
+;               output uc to IO port p
+
+;   PC@         ( p -- uc )
+;               output uc to IO port p
+
+;   !IO         ( -- )
+;               Initialize the serial I/O devices.
+mCODE   3,'!IO', STOIO ;
+    call INIT_IO
+    mNEXT
+
+;   ?RX         ( -- c T | F )
+;               Return input character and true, or a false if no input.
+mCODE	3, '?RX', QRX
+    push BC
+    call CKINCHAR
+    jr nz, QRX1
+    ld BC, FALSEE
+    jr QRX2
+QRX1:
+    call RXA
+    LD C,A
+    LD B,0
+    PUSH BC
+    ld BC, TRUEE
+QRX2:
+    mNEXT
+
+;   TX!         ( c -- )
+;               Send character c to the output device.
+mCODE	3,'TX!',TXSTO
+    ld A,C
+    call TXA
+    pop BC
+    mNEXT
+
+;   ?KEY        ( -- c T | F )
+;               Return input character and true, or a false if no input.
+mCOLON  4,'?KEY',QKEY
+    DW  TQKEY,AT,EXECUTE,EXIT
+
+;   KEY         ( -- c )
+;               Wait for and return an input character.
+mCOLON  3,'KEY',KEY
+KEY1:
+    DW QKEY
+    DW QBRAN,KEY1
+    DW EXIT
+
+;   EMIT        ( c -- )
+;               Send a character to the output device.
+mCOLON  4, 'EMIT', EMIT
+    DW	TEMIT, AT, EXECUTE, EXIT
+
+
+;   NUF?        ( -- t )
+;               Return false if no input, else pause and if CR return true.
+mCOLON  4,'NUF?',NUFQ
+    DW      QKEY,DUPP
+    DW      QBRAN,NUFQ1
+    DW      TwoDROP,KEY,DoLIT,CRR,Equals
+NUFQ1:          
+    DW      EXIT
+
+;   PACE        ( -- )
+;               Send a pace character for the file downloading process.
+mCOLON  4,'PACE',PACE
+    DW      DOLIT,11,EMIT,EXIT
+
+;   SPACE       ( -- )
+;               Send the blank character to the output device.
+mCOLON  5,'SPACE',SPACE
+    DW  BLANK,EMIT,EXIT
+
+;   SPACES      ( +n -- )
+;               Send n spaces to the output device.
+mCOLON  6,'SPACES',SPACES
+	DW	QuestionDUP,QBRAN,SPACES2
+    DW	DoLIT,0,DoDO
+SPACES1: 	
+    DW	SPACE,DoLOOP,SPACES1
+SPACES2: 	
+    DW	EXIT
+
+;   TYPE        ( b u -- )
+;               Output u characters from b.
+;   TYPE        ( b u -- )
+;               Output u characters from b.
+mCOLON	4,'TYPE',TYPEE
+    DW      TOR
+    DW      BRAN,TYPE2
+TYPE1:          
+    DW      DUPP,CAT,EMIT
+    DW      DOLIT,1,PLUS
+TYPE2:          
+    DW      DONXT,TYPE1
+    DW      DROP,EXIT
+
+
+;   CR          ( -- )
+;               Output a carriage return and a line feed.
+mCOLON	2,'CR',CR
+    DW	DoLIT,CRR,EMIT,DoLIT,LFF,EMIT,EXIT
+
+;   do$         ( -- a )
+;               Return the address of a compiled string.
+mCOLON  COMPO+3,'do$',DOSTR
+    DW      RFROM,RAT,RFROM,COUNT,PLUS
+    DW      ALGND,TOR,SWAP,TOR,EXIT
+
+
+;   $"|         ( -- a )
+;               Run time routine compiled by $". Return address of a compiled string.
+
+
+;   ."|         ( -- )
+;               Run time routine of ." . Output a compiled string.
+mCOLON  COMPO+3,'.||',DOTQP
+    DW      DOSTR,COUNT,TYPEE,EXIT
+
+;   .R          ( n +n -- )
+;               Display an integer in a field of n columns, right justified.
+
+;   U.R         ( u +n -- )
+;               Display an unsigned integer in n column, right justified.
+mCOLON  3,'U.R',UDOTR
+    DW  TOR,BDIGS,DIGS,EDIGS
+    DW  RFROM,OVER,Minus
+    DW  SPACES,TYPEE,EXIT
+
+;   U.          ( u -- )
+;               Display an unsigned integer in free format.
+mCOLON  2,'U.',UDOT
+    DW      BDIGS,DIGS,EDIGS
+    DW      SPACE,TYPEE,EXIT
+
+
+;   .           ( w -- )
+;               Display an integer in free format, preceeded by a space.
+mCOLON  1,'.',DOT
+    DW      BASE,AT,DOLIT,10,XORR   ;?decimal
+    DW      QBRAN,DOT1
+    DW      UDOT,EXIT               ;no, display unsigned
+DOT1:           
+    DW      STR,SPACE,TYPEE,EXIT    ;yes, display signed
+
+;   .(          ( -- )
+;               Output following string up to next ) .
+
+;   ?           ( a -- )
+;               Display the contents in a memory cell.
+
+;; Terminal response
+
+;   ^H          ( bot eot cur -- bot eot cur )
+;               Backup the cursor by one character.
+
+
+;   TAP         ( bot eot cur c -- bot eot cur )
+;               Accept and echo the key stroke and bump the cursor.
+
+
+;   kTAP        ( bot eot cur c -- bot eot cur )
+;               Process a key stroke, CR or backspace.
+
+
+;   accept      ( b u -- b u )
+;               Accept characters to input buffer. Return with actual count.
+
+
+;   EXPECT      ( b u -- )
+;               Accept input stream and store count in SPAN.
+
+
+;   QUERY       ( -- )
+;               Accept input stream to terminal input buffer.
+

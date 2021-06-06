@@ -1,0 +1,81 @@
+            .ENGINE mycomputer 
+
+TESTMODE    EQU     0 
+
+            .INCLUDE "constants.z80" 
+            .INCLUDE "word.macro.z80" 
+
+            .ORG    START_ROM 
+
+RESET:            
+            JP      INIT                    ; C3 veclo vechi
+
+            .INCLUDE "interrupt.z80" 
+
+INIT:                
+            LD      HL,SPP                  ; Setup Forth data stack
+            LD      SP,HL                   ; also used as return stack by interrupts etc
+
+            LD      HL,DEFAULTS             ; initialize user variables with defaults
+            LD      DE,UPP                  
+            LD      BC,US                   
+            LDIR                            
+
+            LD      HL,RPP                  ; set up Forth return stack
+            PUSH    HL 
+            POP     IX 
+
+            LD      BC, -1                  ; empty stack marker
+            LD      DE, RESET + 1           ; contains reset vector
+            JP      COLD 
+
+            IF      TESTMODE 
+            JP      TESTS_START 
+
+            ELSE     
+            LD      HL,GREETING 
+            CALL    PRINTSZ 
+LOOP:                
+            CALL    RXA 
+            CALL    TXA 
+            JP      LOOP 
+            ENDIF    
+
+            .INCLUDE "serial.z80" 
+            .INCLUDE "defaults.z80" 
+
+VVCODE      .SET    $ 
+
+            .INCLUDE "core-alu.z80" 
+            .INCLUDE "core-compiler.z80" 
+            .INCLUDE "core-control.z80" 
+            .INCLUDE "core-does.z80" 
+            .INCLUDE "core-format.z80" 
+            .INCLUDE "core-io.z80" 
+            .INCLUDE "core-kernel.z80" 
+            .INCLUDE "core-memory.z80" 
+            .INCLUDE "core-messages.z80" 
+            .INCLUDE "core-stacks.z80" 
+            .INCLUDE "core-user.z80" 
+            .INCLUDE "core-utils.z80" 
+
+            .ORG    END_ROM 
+            .ORG    START_RAM 
+
+            IF      TESTMODE 
+
+TESTS_START:         
+
+            LD      HL,DONE 
+            CALL    PRINTSZ 
+            HALT     
+
+DONE:       .CSTR   "Done!\r\n" 
+
+            ENDIF    
+
+            .INCLUDE "variables.z80" 
+
+            .END     
+
+

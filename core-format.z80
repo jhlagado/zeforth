@@ -1,0 +1,93 @@
+;   DIGIT       ( u -- c )
+;               Convert digit u to a character.
+mCOLON  5,'DIGIT',DIGIT
+    DW      DOLIT,9,OVER,LessThan
+    DW      DOLIT,7,ANDD,PLUS
+    DW      DOLIT,'0',PLUS,EXIT
+
+;   EXTRACT     ( n base -- n c )
+;               Extract the least significant digit from n.
+mCOLON  7,'EXTRACT',EXTRC
+    DW      DOLIT,0,SWAP,UMMOD
+    DW      SWAP,DIGIT,EXIT
+
+
+
+;   <#          ( -- )
+;               Initiate the numeric output process.
+mCOLON  2,'<#',BDIGS
+    DW      PAD,HLD,STORE,EXIT
+
+;   HOLD        ( c -- )
+;               Insert a character into the numeric output string.
+mCOLON  4,'HOLD',HOLD
+    DW      HLD,AT,DOLIT,1,Minus
+    DW      DUPP,HLD,STORE,CStore,EXIT
+
+;   #           ( u -- u )
+;               Extract one digit from u and append the digit to output string.
+mCOLON  1,'#',DIG
+    DW      BASE,AT,EXTRC,HOLD,EXIT
+
+;   #S          ( u -- 0 )
+;               Convert u until all digits are added to the output string.
+mCOLON  2,'#S',DIGS
+DIGS1:          
+    DW      DIG,DUPP
+    DW      QBRAN,DIGS2
+    DW      BRAN,DIGS1
+DIGS2:          
+    DW      EXIT
+
+;   SIGN        ( n -- )
+;               Add a minus sign to the numeric output string.
+mCOLON	4,'SIGN',SIGN
+	DW	ZeroLess,QBRAN,SIGN1
+	DW	DoLIT,MINUSS,HOLD
+SIGN1:		
+    DW	EXIT
+
+
+;   #>          ( w -- b u )
+;               Prepare the output string to be TYPE'd.
+mCOLON  2,'#>',EDIGS
+    DW      DROP,HLD,AT
+    DW      PAD,OVER,Minus,EXIT
+
+
+;   str         ( n -- b u )
+;               Convert a signed integer to a numeric string.
+mCOLON  3,'str',STR
+    DW      DUPP,TOR,ABSS
+    DW      BDIGS,DIGS,RFROM
+    DW      SIGN,EDIGS,EXIT
+
+
+;   HEX         ( -- )
+;               Use radix 16 as base for numeric conversions.
+mCOLON  3,'HEX',HEX
+    DW  DOLIT,16,BASE,STORE,EXIT
+
+;   DECIMAL     ( -- )
+;               Use radix 10 as base for numeric conversions.
+mCOLON  7,'DECIMAL',DECIMAL
+    DW  DOLIT,16,BASE,STORE,EXIT
+
+;   BL          ( -- 32 )
+;               Return 32, the blank character.
+mCOLON	2,'BL',BLANK
+	DW	DoLIT,SPACEE,EXIT
+
+;   >CHAR       ( c -- c )
+;               Filter non-printing characters.
+mCOLON  5,'>CHAR',TCHAR
+    DW      DoLIT,$7F,ANDD,DUPP    ;mask msb
+    DW      DoLIT,127
+    DW      DoLIT,SPACEE,WITHIN    ;check for printable
+    DW      QBRAN,TCHA1
+    DW      DROP,DoLIT,UNDERSC          ;replace non-printables
+TCHA1:          
+    DW      EXIT
+
+
+

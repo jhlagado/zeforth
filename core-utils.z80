@@ -1,0 +1,90 @@
+;   _TYPE       ( b u -- )
+;               Display a string. Filter non-printing characters.
+mCOLON  5,'_TYPE',UTYPE
+    DW      TOR                     ;start count down loop
+    DW      BRAN,UTYP2            ;skip first pass
+UTYP1:          
+    DW      DUPP,CAT,TCHAR,EMIT     ;display only printable
+    DW      DOLIT,1,PLUS            ;increment address
+UTYP2:          
+    DW      DONXT,UTYP1             ;loop till done
+    DW      DROP,EXIT
+
+;   dm+         ( a u -- a )
+;               Dump u bytes from , leaving a+u on the stack.
+mCOLON  3,'dm+',DMP
+    DW      OVER,DOLIT,4,UDOTR      ;display address
+    DW      SPACE,TOR               ;start count down loop
+    DW      BRAN,PDUM2              ;skip first pass
+PDUM1:          
+    DW      DUPP,CAT,DOLIT,3,UDOTR  ;display numeric data
+    DW      DOLIT,1,PLUS            ;increment address
+PDUM2:          
+    DW      DONXT,PDUM1             ;loop till done
+    DW      EXIT
+
+
+;   DUMP        ( a u -- )
+;               Dump u bytes from a, in a formatted manner.
+mCOLON  4,'DUMP',DUMP
+    DW      BASE,AT,TOR,HEX         ;save radix, set hex
+    DW      DOLIT,16,SLASH          ;change count to lines
+    DW      TOR                     ;start count down loop
+DUMP1:          
+    DW      CR,DOLIT,16,TwoDUP,DMP    ;display numeric
+    DW      ROT,ROT
+    DW      SPACE,SPACE,UTYPE       ;display printable characters
+    DW      NUFQ,INVERT              ;user control
+    DW      QBRAN,DUMP2
+    DW      DONXT,DUMP1             ;loop till done
+    DW      BRAN,DUMP3
+DUMP2:          
+    DW      RFROM,DROP              ;cleanup loop stack, early exit
+DUMP3:          
+    DW      DROP,RFROM,BASE,STORE   ;restore radix
+    DW      EXIT
+
+;   .S          ( ... -- ... )
+;               Display the contents of the data stack.
+mCOLON  2,'.S',DOTS
+    DW      CR,DEPTH                ;stack depth
+    DW      TOR                     ;start count down loop
+    DW      BRAN,DOTS2              ;skip first pass
+DOTS1:          
+    DW      RAT,PICK,DOT            ;index stack, display contents
+DOTS2:          
+    DW      DONXT,DOTS1             ;loop till done
+    mDSTRING DOTQP,' <sp'
+    DW      EXIT
+
+
+;   !CSP        ( -- )
+;               Save stack pointer in CSP for error checking.
+
+
+;   ?CSP        ( -- )
+;               Abort if stack pointer differs from that saved in CSP.
+
+
+;   >NAME       ( ca -- na | F )
+;               Convert code address to a name address.
+
+
+;   .ID         ( na -- )
+;               Display the name at address.
+
+
+;   SEE         ( -- ; <string> )
+;               A simple decompiler.
+
+
+;   WORDS       ( -- )
+;               Display the names in the context vocabulary.
+
+
+;   COLD        ( -- )
+;               The hilevel cold start sequence.
+
+
+
+

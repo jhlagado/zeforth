@@ -1,0 +1,122 @@
+;   SP0         ( -- a )
+;               Pointer to bottom of the data stack.
+
+mUSER   3,'SP0',SZERO
+
+;   RP0         ( -- a )
+;               Pointer to bottom of the return stack.
+
+mUSER   3,'RP0',RZERO
+
+;   '?KEY       ( -- a )
+;               Execution vector of ?KEY.
+
+mUSER   5,"'?KEY",TQKEY
+
+;   'EMIT       ( -- a )
+;               Execution vector of EMIT.
+
+mUSER   5,"'EMIT",TEMIT
+
+;   'EXPECT     ( -- a )
+;               Execution vector of EXPECT.
+
+mUSER   7,"'EXPECT",TEXPE
+
+;   'TAP        ( -- a )
+;               Execution vector of TAP.
+
+mUSER   4,"'TAP",TTAP
+
+;   'ECHO       ( -- a )
+;               Execution vector of ECHO.
+
+mUSER   5,"'ECHO",TECHO
+
+;   'PROMPT     ( -- a )
+;               Execution vector of PROMPT.
+
+mUSER   7,"'PROMPT",TPROM
+
+;   BASE        ( -- a )
+;               Storage of the radix base for numeric I/O.
+
+mUSER   4,'BASE',BASE
+
+;   tmp         ( -- a )
+;               A temporary storage location used in parse and find.
+
+mUSER   COMPO+3,'tmp',TEMP
+
+;   SPAN        ( -- a )
+;               Hold character count received by EXPECT.
+
+mUSER   4,'SPAN',SPAN
+
+;   >IN         ( -- a )
+;               Hold the character pointer while parsing input stream.
+
+mUSER   3,'>IN',INN
+
+;   #TIB        ( -- a )
+;               Hold the current count and address of the terminal input buffer.
+
+mUSER   4,'#TIB',NTIB
+vvUSER .set vvUSER + CELLL
+
+;   CSP         ( -- a )
+;               Hold the stack pointer for error checking.
+
+mUSER   3,'CSP',CSP
+
+;   'EVAL       ( -- a )
+;               Execution vector of EVAL.
+
+mUSER   5,"'EVAL",TEVAL
+
+;   'NUMBER     ( -- a )
+;               Execution vector of NUMBER?.
+
+mUSER   7,"'NUMBER",TNUMB
+
+;   HLD         ( -- a )
+;               Hold a pointer in building a numeric output string.
+
+mUSER   3,'HLD',HLD
+
+;   HANDLER     ( -- a )
+;               Hold the return stack pointer for error handling.
+
+mUSER   7,'HANDLER',HANDL
+
+;   CONTEXT     ( -- a )
+;               A area to specify vocabulary search order.
+
+mUSER   7,'CONTEXT',CNTXT
+vvUSER .set vvUSER + VOCSS * CELLL       ;vocabulary stack
+
+;   CURRENT     ( -- a )
+;               Point to the vocabulary to be extended.
+
+mUSER   7,'CURRENT',CRRNT
+vvUSER .set vvUSER + CELLL             ;vocabulary link pointer
+
+;   CP          ( -- a )
+;               Point to the top of the code dictionary.
+
+mUSER   2,'CP',CP
+
+;   NP          ( -- a )
+;               Point to the bottom of the name dictionary.
+
+mUSER   2,'NP',NP
+
+;   LAST        ( -- a )
+;               Point to the last name in the name dictionary.
+
+mUSER   4,'LAST',LAST
+
+;   forth       ( -- a )
+;               Point to the last name in the name dictionary.
+
+mUSER   5,'forth',VFRTH

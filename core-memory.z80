@@ -1,0 +1,144 @@
+;   !           ( w a -- )
+;               Pop the data stack to memory.
+mCODE	1,'!',Store
+	LD	H,B
+	LD	L,C
+	POP	BC
+	LD	(HL),C
+	INC	HL
+	LD	(HL),B
+	POP	BC
+	mNEXT
+
+;   @           ( a -- w )
+;               Push memory location to the data stack.
+mCODE	1,'@', AT
+	LD	H,B
+	LD	L,C
+	LD	C,(HL)
+	INC	HL
+	LD	B,(HL)
+	mNEXT
+
+;   C!          ( c b -- )
+;               Pop the data stack to byte memory.
+mCODE	2,'C!',CStore
+	LD	H,B
+	LD	L,C
+	POP	BC
+	LD	(HL),C
+	POP	BC
+	mNEXT
+
+;   C@          ( b -- c )
+;               Push byte memory location to the data stack.
+mCODE	2,'C@',CAT
+	LD	A,(BC)
+	LD	C,A
+	LD	B,0
+	mNEXT
+
+;   R@          ( -- w )
+;               Copy top of return stack to the data stack.
+mCODE	COMPO+2,'R@',RAT
+	PUSH	BC
+	LD	C,(IX+0)
+	LD	B,(IX+1)
+	mNEXT
+
+;   RP@         ( -- a )
+;               Push the current RP to the data stack
+mCODE	COMPO+3, 'rp@', RPFetch
+    DB	0C5h	; PUSH	BC	;11t
+    DB	0DDh,0E5h ; PUSH IX	;15t
+    DB	0C1h	; POP	BC	;10t
+    mNEXT
+
+
+;   RP!         ( a -- )
+;               Set the return stack pointer.
+mCODE	COMPO+3,'rp!',RPStore
+	DB	0C5h	; PUSH	BC	;11t
+	DB	0DDh,0E1h ; POP IX	;14t
+	DB	0C1h	; POP	BC	;10t
+	mNEXT
+
+;   SP@         ( -- a )
+;               Push the current data stack pointer.
+mCODE	3, 'sp@', SPFetch
+	DB	0C5h	; PUSH	BC	;11t
+	DB	021h	; LD	HL,0	;10t
+	DW	0
+	DB	039h	; ADD	HL,SP	;11t
+	DB	044h	; LD	B,H	; 4t
+	DB	04Dh	; LD	C,L	; 4t
+	mNEXT
+
+;   SP!         ( a -- )
+;               Set the data stack pointer.
+mCODE	3,'sp!',SPStore
+	DB	060h	; LD	H,B	; 4t
+	DB	069h	; LD	L,C	; 4t
+	DB	0F9h	; LD	SP,HL	; 6t
+	DB	0C1h	; POP	BC	;10t
+	mNEXT
+
+
+;   +!          ( n a -- )
+;               Add n to the contents at address a.
+
+
+;   2!          ( d a -- )
+;               Store the double integer to address a.
+
+
+;   2@          ( a -- d )
+;               Fetch double integer from address a.
+
+ 
+;   COUNT       ( b -- b +n )
+;               Return count byte of a string and add 1 to byte address.
+
+ 
+;   HERE        ( -- a )
+;               Return the top of the code dictionary.
+mCOLON  4,'HERE',HERE
+    DW  CP,AT,EXIT
+
+;   PAD         ( -- a )
+;               Return the address of a temporary buffer.
+mCOLON  3,'PAD',PAD
+    DW  HERE,DOLIT,80,PLUS,EXIT
+
+;   TIB         ( -- a )
+;               Return the address of the terminal input buffer.
+
+
+;   @EXECUTE    ( a -- )
+;               Execute vector stored in address a.
+
+
+;   CMOVE       ( b1 b2 u -- )
+;               Copy u bytes from b1 to b2.
+
+
+;   FILL        ( b u c -- )
+;               Fill u bytes of character c to area beginning at b.
+
+
+;   -TRAILING   ( b u -- b u )
+;               Adjust the count to eliminate trailing white space.
+
+
+;   PACK$       ( b u a -- a )
+;               Build a counted string with u characters from b. Null fill.
+
+;   ALIGNED     ( b -- a )
+;               Align address to the cell boundary.
+mCOLON  7,'ALIGNED', ALGND
+    DW      DUPP,DOLIT,0,DOLIT,CELLL
+    DW      UMMOD,DROP,DUPP
+    DW      QBRAN,ALGN1
+    DW      DoLIT,CELLL,SWAP,Minus
+ALGN1:          
+    DW      PLUS,EXIT

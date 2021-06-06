@@ -1,0 +1,91 @@
+;   >R          ( w -- )
+;               Push the data stack to the return stack.
+mCODE	COMPO+2, '>R', ToR
+	DEC  IX
+	LD  (IX+0),B
+	DEC  IX
+	LD  (IX+0),C
+	POP	BC
+	mNEXT
+
+;   R>          ( -- w )
+;               Pop the return stack to the data stack.
+mCODE	COMPO+2, 'R>', RFrom
+	PUSH BC
+	LD	C,(IX+0)
+	INC	IX
+	LD	B,(IX+0)
+	INC	IX
+	mNEXT
+
+;   DUP         ( w -- w w )
+;               Duplicate the top stack item.
+mCODE	3, 'DUP', DUPP
+	PUSH BC
+    mNEXT
+
+;   DROP	( x -- )			\ CORE
+;		Discard top stack item.
+mCODE	4, 'DROP', DROP
+	POP	BC
+    mNEXT
+
+;   SWAP        ( w1 w2 -- w2 w1 )
+;               Exchange top two stack items.
+mCODE	4, 'SWAP', SWAP
+	POP	HL
+	PUSH	BC
+	LD	B,H
+	LD	C,L
+	mNEXT
+
+;   OVER        ( w1 w2 -- w1 w2 w1 )
+;               Copy second stack item to top.
+mCODE	4, 'OVER', OVER
+	POP	HL
+	PUSH	HL
+	PUSH	BC
+	LD	B,H
+	LD	C,L
+	mNEXT
+
+;   ?DUP        ( w -- w w | 0 )
+;               Dup tos if its is not zero.
+mCOLON	4,'?DUP', QuestionDUP
+	DW	DUPP, QBRAN, QDUP1
+	DW	DUPP
+QDUP1:		
+    DW	EXIT
+
+;   ROT         ( w1 w2 w3 -- w2 w3 w1 )
+;               Rot 3rd item to top.
+mCOLON	3,'ROT', ROT
+	DW	ToR, SWAP, RFrom, SWAP, EXIT
+
+;   2DROP       ( w w -- )
+;               Discard two items on stack.
+mCOLON	5,'2DROP',TwoDROP
+    DW	DROP, DROP, EXIT
+
+;   2DUP        ( w1 w2 -- w1 w2 w1 w2 )
+;               Duplicate top two items.
+mCOLON	4,'2DUP',TwoDUP
+    DW	OVER, OVER, EXIT
+
+;   2SWAP        ( w1 w2 w3 w4 -- w3 w4 w1 w2 )
+;               Exchange top two items.
+mCOLON	5,'2SWAP',TwoSWAP
+	DW	ROT, ToR, ROT, RFrom, EXIT
+
+;   PICK        ( ... +n -- ... w )
+;               Copy the nth stack item to tos.
+mCOLON  4,'PICK',PICK
+    DW  DOLIT,1,PLUS,CELLS
+    DW  SPFetch,PLUS,AT,EXIT
+
+;   DEPTH       ( -- n )
+;               Return the depth of the data stack.
+mCOLON	5,'DEPTH',DEPTH
+	DW	SPFetch,SZero,AT,SWAP,Minus
+	DW	DoLIT,CELLL,Slash,EXIT
+

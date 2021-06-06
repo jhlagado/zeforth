@@ -1,0 +1,67 @@
+;   FOR         ( -- a )
+;               Start a FOR-NEXT loop structure in a colon definition.
+mCOLON  IMEDD+3,'FOR',FOR
+    DW      COMPI,TOR,HERE,EXIT
+
+;   BEGIN       ( -- a )
+;               Start an infinite or indefinite loop structure.
+mCOLON  IMEDD+5,'BEGIN',BEGIN
+    DW      HERE,EXIT
+
+;   NEXT        ( a -- )
+;               Terminate a FOR-NEXT loop structure.
+mCOLON  IMEDD+4,'NEXT',NEXT
+    DW      COMPI,DONXT,COMMA,EXIT
+
+;   UNTIL       ( a -- )
+;               Terminate a BEGIN-UNTIL indefinite loop structure.
+mCOLON  IMEDD+5,'UNTIL',UNTIL
+    DW      COMPI,QBRAN,COMMA,EXIT
+
+;   AGAIN       ( a -- )
+;               Terminate a BEGIN-AGAIN infinite loop structure.
+mCOLON  IMEDD+5,'AGAIN',AGAIN
+    DW      COMPI,BRAN,COMMA,EXIT
+
+
+;   IF          ( -- A )
+;               Begin a conditional branch structure.
+
+
+;   AHEAD       ( -- A )
+;               Compile a forward branch instruction.
+
+
+;   REPEAT      ( A a -- )
+;               Terminate a BEGIN-WHILE-REPEAT indefinite loop.
+
+
+;   THEN        ( A -- )
+;               Terminate a conditional branch structure.
+
+;   ELSE        ( A -- A )
+;               Start the false clause in an IF-ELSE-THEN structure.
+
+
+;   WHILE       ( a -- A a )
+;               Conditional branch out of a BEGIN-WHILE-REPEAT loop.
+
+
+;   ABORT"      ( -- ; <string> )
+;               Conditional abort with an error message.
+
+
+;   $"          ( -- ; <string> )
+;               Compile an inline string literal.
+
+
+;   ."          ( -- ; <string> )
+;               Compile an inline string literal to be typed out at run time.
+
+;   UNLOOP	( -- ) ( R: loop-sys -- )	\ CORE
+;		Discard loop-control parameters for the current nesting level.
+;		An UNLOOP is required for each nesting level before the
+;		definition may be EXITed.
+mCOLON	COMPO+6,'UNLOOP',UNLOOP
+	DW	RFrom,RFrom,RFrom,TwoDROP,ToR,EXIT
+

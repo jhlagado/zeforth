@@ -1,0 +1,158 @@
+;   doCONST	( -- x )
+;	Run-time routine of CONSTANT and VARIABLE.
+mCODE	COMPO+7, 'doCONST', DoCONST
+    POP	HL	                        ;10t
+    PUSH BC	                        ;11t
+    LD C,(HL)	                    ; 7t
+    INC	HL	                        ; 6t
+    LD B,(HL)	                    ; 7t
+    mNEXT
+
+
+;   doLIST	( -- ) ( R: -- nest-sys )
+;	Process colon list.
+mCODE	COMPO+6, 'doLIST', DoLIST
+    DEC IX	                        ;10t
+    LD  (IX+0),D	                ;19t
+    DEC IX	                        ;10t
+    LD  (IX+0),E	                ;19t
+    POP	HL	                        ;10t
+    mNEXTHL							
+
+;   doLIT	( -- x )
+;	Push an inline literal.
+mCODE	COMPO+5, 'doLIT', DoLIT
+    PUSH BC	                        ; 11t
+    EX	DE,HL	                    ; 4t
+    LD	C,(HL)	                    ; 7t
+    INC	HL	                        ; 6t
+    LD	B,(HL)	                    ; 7t
+    INC	HL	                        ; 6t
+    mNEXTHL
+
+;   doVAR       ( -- a )
+;   Run time routine for VARIABLE and CREATE.
+mCOLON  COMPO+5, 'doVAR', DoVAR
+    DW  RFROM,EXIT
+
+;   UP          ( -- a )
+;   Pointer to the user area.
+mCOLON  2, 'UP', UP
+    DW  DoVAR
+    DW  UPP
+
+;   doUSER      ( -- a )
+;   Run time routine for user variables.
+mCOLON  COMPO+6,'doUSER',DOUSE
+    DW RFROM, AT, UP, AT, PLUS, EXIT
+
+;   EXIT	( -- ) ( R: nest-sys -- )	\ CORE
+;	Return control to the calling definition.
+mCODE	COMPO+4, 'EXIT', EXIT
+	LD	L,(IX+0)
+	INC	IX
+	LD	H,(IX+0)
+	INC	IX
+    mNEXTHL
+    
+;   doDO	( n1|u1 n2|u2 -- ) ( R: -- n1 n2-n1-max_negative )
+;		Run-time funtion of DO.
+;
+;   : doDO	>R max-negative + R> OVER - SWAP R> SWAP >R SWAP >R >R ;
+
+mCOLON	COMPO+4,'doDO',DoDO
+	DW	ToR,DoLIT,MaxNegative,Plus,RFrom
+	DW	OVER,Minus,SWAP,RFrom,SWAP,ToR,SWAP,ToR,ToR,EXIT
+
+;   doLOOP	( -- ) ( R: loop-sys1 -- | loop-sys2 )
+;		Run time routine for LOOP.
+
+mCODE	COMPO+6,'doLOOP',DoLOOP
+	PUSH IX	        ; 15t
+	POP	HL	        ; 10t
+	INC	(HL)	    ; 11t
+	JR Z,DOLOOP2	; 12/7t a fast dec is ok, only
+DOLOOP1: 	
+    LD	A,(DE)	    ; 7t go back to the loop
+	LD	L,A	        ; 4t
+	INC	DE	        ; 6t
+	LD	A,(DE)	    ; 7t
+	LD	H,A	        ; 4t
+	mNEXTHL
+DOLOOP2: 	
+    INC	HL	        ; 6t
+	INC	(HL)	    ;11t
+	JP PO,DOLOOP1   ;10/7t ?loop end
+	EX	DE,HL	    ; 4t yes,continue past the BRAN offset
+	LD	DE,4	    ;10t clear return stack
+	ADD IX,DE	    ;15h
+	INC	HL	        ; 6t
+	INC	HL	        ; 6t
+	mNEXTHL
+
+;   do+LOOP	( n -- ) ( R: loop-sys1 -- | loop-sys2 )
+;		Run time routine for +LOOP.
+
+mCODE	COMPO+7,'do+LOOP',DoPLOOP
+	POP	HL	        ;10t this will be the new TOS
+	PUSH	BC	    ;11t
+	LD	B,H	        ; 4t
+	LD	C,L	        ; 4t
+	EXX		        ; 4t
+	POP	BC	        ;10t old TOS = loop increment
+	LD L,(IX+0)     ;19t
+	LD H,(IX+1)     ;19t
+	OR	A	        ; 4t clear carry
+	ADC HL,BC	    ;15t
+	JP PE,DOPLP1	;10/7t ?loop end
+	LD (IX+0),L     ;19t   no, go back
+	LD (IX+1),H     ;19t
+	EXX		        ; 4t
+	LD	A,(DE)	    ; 7t go back to the loop
+	LD	L,A	        ; 4t
+	INC	DE	        ; 6t
+	LD	A,(DE)	    ; 7t
+	LD	H,A	        ; 4t
+	mNEXTHL
+DOPLP1:		
+    LD	BC,4	    ;10t clear return stack
+	ADD IX,BC	    ;15h
+	EXX		        ; 4t
+	INC	DE	        ; 6t yes,continue past the BRAN offset
+	INC	DE	        ; 6t
+	mNEXT
+
+;   next        ( -- )
+;               Run time code for the single index loop.
+;               : next ( -- ) \ hilevel model
+;                 r> r> dup if 1 - >r @ >r exit then drop cell+ >r ;
+
+mCODE   COMPO+4,'next',DONXT
+    PUSH IX
+    POP HL                              ; load rp into HL
+    LD  A, (HL)                         ; a = low byte of r@
+    OR  A        
+    JR  NZ, DECLOW                      ; low > 0 goto dec low
+    INC HL                              
+    LD  A, (HL)                         ; a = high byte of r@
+    OR  A        
+    JR  NZ, DECHILO                     ; high > 0 goto dec hi dec lo
+    INC HL                              
+    PUSH HL                             
+    POP IX                              ; pop r@
+    INC DE                              ; IP = skip following word 
+    INC DE       
+    mNEXT                               ; continue
+DECHILO:
+    DEC (HL)                            ; dec high byte of r@
+    DEC HL       
+DECLOW:
+    DEC (HL)                            ; dec low byte of r@
+    LD  L, E                            ; DE points to location of loop address
+    LD  H, D                                
+    LD  E, (HL)                         ; DE points to loop address    
+    INC HL       
+    LD  D, (HL)  
+    mNEXT                               ; continue to loop address
+
+

@@ -1,0 +1,103 @@
+;; Numeric input, single precision
+
+;   DIGIT?      ( c base -- u t )
+;               Convert a character to its numeric value. A flag indicates success.
+
+
+;   NUMBER?     ( a -- n T | a F )
+;               Convert a number string to integer. Push a flag on tos.
+
+
+;; Parsing
+
+;   parse       ( b u c -- b u delta ; <string> )
+;               Scan string delimited by c. Return found string and its offset.
+
+
+;   PARSE       ( c -- b u ; <string> )
+;               Scan input stream and return counted string delimited by c.
+
+
+;   (           ( -- )
+;               Ignore following string up to next ) . A comment.
+
+
+;   \           ( -- )
+;               Ignore following text till the end of line.
+
+
+;   CHAR        ( -- c )
+;               Parse next word and return its first character.
+
+
+;   TOKEN       ( -- a ; <string> )
+;               Parse a word from input stream and copy it to name dictionary.
+
+
+;   WORD        ( c -- a ; <string> )
+;               Parse a word from input stream and copy it to code dictionary.
+
+
+;; Dictionary search
+
+;   NAME>       ( na -- ca )
+;               Return a code address given a name address.
+
+
+;   SAME?       ( a a u -- a a f \ -0+ )
+;               Compare u cells in two strings. Return 0 if identical.
+
+
+;   find        ( a va -- ca na | a F )
+;               Search a vocabulary for a string. Return ca and na if succeeded.
+
+
+;   NAME?       ( a -- ca na | a F )
+;               Search all context vocabularies for a string.
+
+
+;; Error handling
+
+;   CATCH       ( ca -- 0 | err# )
+;               Execute word at ca and set up an error frame for it.
+
+
+;   THROW       ( err# -- err# )
+;               Reset system to current local error frame an update error flag.
+
+
+;   NULL$       ( -- a )
+;               Return address of a null string with zero count.
+
+
+;   ABORT       ( -- )
+;               Reset data stack and jump to QUIT.
+
+
+;   abort"      ( f -- )
+;               Run time routine of ABORT" . Abort with a message.
+
+
+;; The text interpreter
+
+;   $INTERPRET  ( a -- )
+;               Interpret a word. If failed, try to convert it to an integer.
+
+
+;   [           ( -- )
+;               Start the text interpreter.
+
+
+;   .OK         ( -- )
+;               Display 'ok' only while interpreting.
+
+
+;   ?STACK      ( -- )
+;               Abort if the data stack underflows.
+
+
+;   EVAL        ( -- )
+;               Interpret the input stream.
+
+
+

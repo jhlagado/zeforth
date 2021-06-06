@@ -1,0 +1,34 @@
+.align 2
+
+DEFAULTS:  
+
+defSP0:             DW SPP                  ; SP0
+defRP0:             DW RPP                  ; RP0
+defQKEY:            DW QRX                  ; '?KEY
+defTEMIT:           DW TXSTO                ; 'EMIT
+defTEXPECT:         DW 0                    ; 'EXPECT
+defTTAP:            DW 0                    ; 'TAP
+defTECHO:           DW TXSTO                ; 'ECHO
+defTPROMPT:         DW 0                    ; 'PROMPT
+defBASE:            DW 0                    ; BASE
+defTMP:             DW 0                    ; tmp
+defSPAN:            DW 0                    ; SPAN
+defPIN:             DW 0                    ; >IN
+defNTIB:            DW 0                    ; #TIB
+defTIB:             DW TIBB                 ; TIB
+defCSP:             DW 0                    ; CSP
+defTEVAL:           DW 0                    ; 'EVAL
+defTNUM:            DW 0                    ; 'NUMBER
+defHLD:             DW 0                    ; HLD
+defHANDLER:         DW 0                    ; HANDLER
+defCONTEXT:         DW 0                    ; CONTEXT pointer
+defVOCABS:          DW 0                    ; vocabulary stack    ???
+defCURRENT:         DW 0                    ; CURRENT pointer
+defVOCABLP:         DW 0                    ; vocabulary link pointer ???
+defCP:              DW CPP                  ; CP  for runing phase on RAM
+defNP:              DW NPP                  ; NP  for runing phase on RAM
+defLAST:            DW 0                    ; LAST
+defFORTH:           DW 0                    ; FORTH   \ mullti-user ???
+defVOCABL:          DW 0                    ; vocabulary link       ???
+defCOLD             DW 0                    ; 'COLD'
+END_DEFAULTS:

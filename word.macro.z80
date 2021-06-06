@@ -1,0 +1,67 @@
+; Initialize assembly variables
+
+vvCODE .set 0
+vvNAME .set END_ROM
+
+vvLINK .set 0                                     ;force a null link
+vvUSER .set 0                             ;first user variable offset
+
+.macro mCODE, aaLEX, aaNAME, aaLABEL
+    .align 2                                         ;;force to cell boundary
+aaLABEL:                                              ;;assembly label
+    vvCODE .set $
+    vvLEN  .set (aaLEX & 01FH) / CELLL              ;;string cell count, round down
+    ORG vvNAME - ((vvLEN + 3) * CELLL)                                     ; ? needed
+    vvNAME .set $
+    DW vvCODE, vvLINK                               ;;token pointer and link
+    vvLINK .set $                                   ;;link points to a name string
+    DB aaLEX, aaNAME                                    ;;name string
+    ORG vvCODE                                      ;;restore code pointer
+.endm
+
+.macro mCOLON, aaLEX, aaNAME, aaLABEL
+    mCODE aaLEX, aaNAME, aaLABEL
+    nop                                     
+    CALL doLIST
+.endm
+
+.macro mCONST, aaLEX, aaNAME, aaLABEL, aaVALUE
+	mCODE aaLEX, aaNAME, aaLABEL
+	nop
+	call DoCONST             
+	DW	aaVALUE
+.endm
+
+.macro mUSER, aaLEX, aaNAME, aaLABEL
+	mCODE aaLEX, aaNAME, aaLABEL
+    nop                                     
+    CALL doLIST
+    DW DoUSE,vvUSER               
+    vvUSER .set vvUSER + CELLL
+.endm
+
+.macro mDSTRING, aaFUNC, aaSTR
+    DW aaFUNC                       ;;function
+    vvLEN .set $                    ;;save address of count byte
+    DB 0,aaSTR                      ;;count byte and string
+    vvCODE .set $                   ;;save code pointer
+ORG vvLEN                           ;;point to count byte
+    DB vvCODE - vvLEN - 1           ;;set count
+ORG vvCODE                          ;;restore code pointer
+    .align 2
+.endm
+
+.macro mNEXTHL
+	LD	E,(HL)	                    ; 7t
+	INC	HL	                        ; 6t
+	LD	D,(HL)	                    ; 7t
+	INC	HL	                        ; 6t
+	EX	DE,HL	                    ; 4t
+	JP	(HL)	                    ; 4t
+.endm   	                        ; 34t
+
+.macro mNEXT
+	EX	DE,HL	                    ; 4t
+    mNEXTHL                         ; 34t
+.endm   	                        ; 38t
+

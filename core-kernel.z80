@@ -1,0 +1,57 @@
+
+mCOLON	4,'COLD',COLD
+    ; DW	SPZero,SPStore,RPZero,RPStore
+    ; DW	TickINIT_IO,EXECUTE,TickBoot,EXECUTE
+
+    DW  STOIO
+    ; DW	DOLIT, 65, EMIT
+    DW  DOLIT, HELLO, COUNT, TYPEE
+    DW	QUIT
+HELLO: .pstr "Hello Forth! \r\n"
+
+mCODE  4, 'QUIT', QUIT
+    HALT
+
+;   EXECUTE	( i*x xt -- j*x )		\ CORE
+;		Perform the semantics indentified by execution token, xt.
+mCODE	7,'EXECUTE', EXECUTE
+	LD	H,B
+	LD	L,C
+	POP	BC
+	JP	(HL)
+	
+;   0BRAN	( flag -- )
+;		BRAN if flag is zero.
+mCODE	COMPO+7,'?branch', QBRAN
+	LD	A,B	; 4t
+	OR	C	; 4t
+	POP	BC	;10t
+	JP  Z,BRAN ;10/7t a fast dec is ok, only
+    INC	DE	; 6t yes,continue past the BRAN offset
+	INC	DE	; 6t
+	mNEXT
+
+;   BRAN	( -- )
+;		BRAN to an inline address.
+mCODE	COMPO+6,'branch', BRAN
+	LD	A,(DE)	; 7t go back to the loop
+	LD	L,A	; 4t
+	INC	DE	; 6t
+	LD	A,(DE)	; 7t
+	LD	H,A	; 4t
+	mNEXTHL
+	
+;   TYPECSTR    ( cstr -- )
+;   Similar to TYPE but prints C null terminated strings
+mCODE	3,'TYPESZ',TypeCStr
+    ld H,B
+    ld L,C
+    call PRINTSZ
+    pop BC
+    mNEXT
+
+;   THROW    ( cstr -- )
+;   Prints string message and returns TODO: restart Forth interpreter QUIT
+mCOLON	5,'THROW',THROW
+	DW  TypeCStr, EXIT
+

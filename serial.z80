@@ -1,0 +1,66 @@
+; Modified from code by Grant Searle
+; Minimum 6850 ACIA interrupt driven serial I/O
+
+INIT_IO:
+    DI   ; Disable interrupts
+    LD HL, serBuf
+    LD (serInPtr), HL 
+    LD (serRdPtr), HL  
+    XOR A
+    LD (serBufUsed), A   
+    LD A,RTS_LOW
+    OUT ($80),A  ; Initialise ACIA
+    EI
+    RET
+
+RXA:
+waitForChar: 
+    LD A,(serBufUsed)
+    CP $00
+    JR Z, waitForChar
+    PUSH HL
+    LD HL,(serRdPtr)
+    INC HL
+    LD A,L  ; Only need to check low byte becasuse buffer<256 bytes
+    CP (serBuf+SER_BUFSIZE) & $FF
+    JR NZ, notRdWrap
+    LD HL,serBuf
+notRdWrap: 
+    DI
+    LD (serRdPtr),HL
+    LD A,(serBufUsed)
+    DEC A
+    LD (serBufUsed),A
+    CP SER_EMPTYSIZE
+    JR NC,rts1
+    LD A,RTS_LOW
+    OUT ($80),A
+rts1:
+    LD A,(HL)
+    EI
+    POP HL
+    RET   ; Char ready in A
+
+TXA:  
+    PUSH AF  ; Store character
+conout1: 
+    IN A,($80)  ; Status byte 
+    BIT 1,A  ; Set Zero flag if still transmitting character 
+    JR Z,conout1 ; Loop until flag signals ready
+    POP AF  ; Retrieve character
+    OUT ($81),A  ; Output the character
+    RET
+
+CKINCHAR: 
+    LD A,(serBufUsed)
+    CP $0
+    RET
+
+PRINTSZ:  
+    LD A,(HL)  ; Get character
+    OR A  ; Is it $00 ?
+    RET Z  ; Then RETurn on terminator
+    CALL TXA  ; Print it
+    INC HL  ; Next Character
+    JR PRINTSZ  ; Continue until $00
+    RET

@@ -1,0 +1,446 @@
+;   !           ( w a -- )
+;               Pop the data stack to memory.
+mCODE	1,'!',Store
+	LD	H,B
+	LD	L,C
+	POP	BC
+	LD	(HL),C
+	INC	HL
+	LD	(HL),B
+	POP	BC
+	mNEXT
+
+;   @           ( a -- w )
+;               Push memory location to the data stack.
+mCODE	1,'@', AT
+	LD	H,B
+	LD	L,C
+	LD	C,(HL)
+	INC	HL
+	LD	B,(HL)
+	mNEXT
+
+;   C!          ( c b -- )
+;               Pop the data stack to byte memory.
+mCODE	2,'C!',CStore
+	LD	H,B
+	LD	L,C
+	POP	BC
+	LD	(HL),C
+	POP	BC
+	mNEXT
+
+;   C@          ( b -- c )
+;               Push byte memory location to the data stack.
+mCODE	2,'C@',CFetch
+	LD	A,(BC)
+	LD	C,A
+	LD	B,0
+	mNEXT
+
+;   >R          ( w -- )
+;               Push the data stack to the return stack.
+mCODE	COMPO+2, '>R', ToR
+	DEC  IX
+	LD  (IX+0),B
+	DEC  IX
+	LD  (IX+0),C
+	POP	BC
+	mNEXT
+
+;   R@          ( -- w )
+;               Copy top of return stack to the data stack.
+mCODE	COMPO+2,'R@',RFetch
+	PUSH	BC
+	LD	C,(IX+0)
+	LD	B,(IX+1)
+	mNEXT
+
+;   R>          ( -- w )
+;               Pop the return stack to the data stack.
+mCODE	COMPO+2, 'R>', RFrom
+	PUSH BC
+	LD	C,(IX+0)
+	INC	IX
+	LD	B,(IX+0)
+	INC	IX
+	mNEXT
+
+;   RP@         ( -- a )
+;               Push the current RP to the data stack
+mCODE	COMPO+3, 'rp@', RPFetch
+    DB	0C5h	; PUSH	BC	;11t
+    DB	0DDh,0E5h ; PUSH IX	;15t
+    DB	0C1h	; POP	BC	;10t
+    mNEXT
+
+
+;   RP!         ( a -- )
+;               Set the return stack pointer.
+mCODE	COMPO+3,'rp!',RPStore
+	DB	0C5h	; PUSH	BC	;11t
+	DB	0DDh,0E1h ; POP IX	;14t
+	DB	0C1h	; POP	BC	;10t
+	mNEXT
+
+;   SP@         ( -- a )
+;               Push the current data stack pointer.
+mCODE	3, 'sp@', SPFetch
+	DB	0C5h	; PUSH	BC	;11t
+	DB	021h	; LD	HL,0	;10t
+	DW	0
+	DB	039h	; ADD	HL,SP	;11t
+	DB	044h	; LD	B,H	; 4t
+	DB	04Dh	; LD	C,L	; 4t
+	mNEXT
+
+;   SP!         ( a -- )
+;               Set the data stack pointer.
+mCODE	3,'sp!',SPStore
+	DB	060h	; LD	H,B	; 4t
+	DB	069h	; LD	L,C	; 4t
+	DB	0F9h	; LD	SP,HL	; 6t
+	DB	0C1h	; POP	BC	;10t
+	mNEXT
+
+
+;   DUP         ( w -- w w )
+;               Duplicate the top stack item.
+mCODE	3, 'DUP', DUPP
+	PUSH BC
+    mNEXT
+
+;   DROP	( x -- )			\ CORE
+;		Discard top stack item.
+mCODE	4, 'DROP', DROP
+	POP	BC
+    mNEXT
+
+;   SWAP        ( w1 w2 -- w2 w1 )
+;               Exchange top two stack items.
+mCODE	4, 'SWAP', SWAP
+	POP	HL
+	PUSH	BC
+	LD	B,H
+	LD	C,L
+	mNEXT
+
+;   OVER        ( w1 w2 -- w1 w2 w1 )
+;               Copy second stack item to top.
+mCODE	4, 'OVER', OVER
+	POP	HL
+	PUSH	HL
+	PUSH	BC
+	LD	B,H
+	LD	C,L
+	mNEXT
+
+;   0<          ( n -- t )
+;               Return true if n is negative.
+mCODE	2,'0<', ZeroLess
+	SLA B	; sign bit -> cy flag
+	SBC	A,A	; propagate cy through A
+	LD	B,A	; put 0000 or FFFF in TOS
+	LD	C,A
+	mNEXT
+
+;   AND         ( w w -- w )
+;               Bitwise AND.
+mCODE	3, 'AND', ANDD
+	POP	HL
+	LD	A,B
+	AND	H
+	LD	B,A
+	LD	A,C
+	AND	L
+	LD	C,A
+	mNEXT
+
+;   OR          ( w w -- w )
+;               Bitwise inclusive OR.
+mCODE	2,'OR', ORR
+	POP	HL
+	LD	A,B
+	OR	H
+	LD	B,A
+	LD	A,C
+	OR	L
+	LD	C,A
+	mNEXT
+
+;   XOR         ( w w -- w )
+;               Bitwise exclusive
+mCODE	3, 'XOR', XORR
+	POP	HL
+	LD	A,B
+	XOR	H
+	LD	B,A
+	LD	A,C
+	XOR	L
+	LD	C,A
+	mNEXT
+
+;   UM+         ( w w -- w cy )
+;               Add two numbers, return the sum and carry flag.
+mCODE	3,'um+',UMPlus
+    POP	HL	            ;10t
+	ADD	HL,BC	        ;11t
+	PUSH	HL	        ;11t
+	LD	BC,0	        ;10t
+	JR	NC,UMP1         ;12/7t
+UMP2:		
+    INC	BC	            ; 6t
+UMP1:		
+    mNEXT
+
+; High level code replaced by low level code
+
+
+
+;;  UM/MOD      ( dl dh u -- ur uq )
+;;;               Unsigned divide of a double by a single. Return mod and quotient.
+
+
+
+
+
+;; Common functions
+
+;   FORTH       ( -- )
+;               Make FORTH the context vocabulary.
+
+
+;   ?DUP        ( w -- w w | 0 )
+;               Dup tos if its is not zero.
+mCOLON	4,'?DUP', QuestionDUP
+	DW	DUPP, ZBranch, QDUP1
+	DW	DUPP
+QDUP1:		
+    DW	EXIT
+
+
+;   ROT         ( w1 w2 w3 -- w2 w3 w1 )
+;               Rot 3rd item to top.
+mCOLON	3,'ROT', ROT
+	DW	ToR, SWAP, RFrom, SWAP, EXIT
+
+;   2DROP       ( w w -- )
+;               Discard two items on stack.
+mCOLON	5,'2DROP',TwoDROP
+    DW	DROP, DROP, EXIT
+
+;   2DUP        ( w1 w2 -- w1 w2 w1 w2 )
+;               Duplicate top two items.
+mCOLON	4,'2DUP',TwoDUP
+    DW	OVER, OVER, EXIT
+
+;   2SWAP        ( w1 w2 w3 w4 -- w3 w4 w1 w2 )
+;               Exchange top two items.
+mCOLON	5,'2SWAP',TwoSWAP
+	DW	ROT, ToR, ROT, RFrom, EXIT
+
+;   +           ( w w -- sum )
+;               Add top two items.
+mCOLON	1,'+', PLUS
+    DW	UMPlus, DROP, EXIT
+
+;   D+          ( d d -- d )
+;               Double addition, as an example using UM+.
+;
+;               $ COLON  2,'D+',DPLUS
+;               DW      TOR,SWAP,TOR,UPLUS
+;               DW      RFROM,RFROM,PLUS,PLUS,EXIT
+mCOLON	2,'D+',DPlus
+	DW	ToR,SWAP,ToR,UMPlus
+	DW	RFrom,RFrom,Plus,Plus,EXIT
+
+;   NOT         ( w -- w )
+;               One's complement of tos.
+mCOLON  3, 'NOT', INVERT
+    DW  DoLIT, -1, XORR, EXIT
+
+;   NEGATE      ( n -- -n )
+;               Two's complement of tos.
+mCOLON	6,'NEGATE',NEGATE
+    DW	INVERT, OnePlus, EXIT
+
+;   1+		( n1|u1 -- n2|u2 )		
+;		Increase top of the stack item by 1.
+mCOLON	2,'1+',OnePlus
+	DW	DoLIT, 1, Plus, EXIT
+
+;   DNEGATE     ( d -- -d )
+;               Two's complement of top double.
+mCOLON	7,'DNEGATE',DNEGATE
+	DW	INVERT, ToR, INVERT
+	DW	DoLIT, 1, UMPlus
+	DW	RFrom, Plus, EXIT
+
+;   -           ( n1 n2 -- n1-n2 )
+;               Subtraction.
+mCOLON	1, '-', Minus
+	DW	NEGATE,Plus,EXIT
+
+;   ABS         ( n -- n )
+;               Return the absolute value of n.
+mCOLON	3,'ABS',ABSS
+    DW	DUPP, ZeroLess, ZBranch, ABS1
+    DW	NEGATE
+ABS1:		
+    DW	EXIT
+
+;   =           ( w w -- t )
+;               Return true if top two are equal.
+mCOLON	1, '=', Equals
+	DW	XORR, ZeroEquals, EXIT
+
+;   0=		( x -- flag )			\ CORE
+;		Return true if x is zero.
+
+mCODE	2,'0=',ZeroEquals,_FLINK
+	LD	A,B
+	OR	C	; result=0 if bc was 0
+	SUB	1	; cy set   if bc was 0 ;;; ???? TODO: replace with DEC A 
+	SBC	A,A	; propagate cy through A
+	LD	B,A	; put 0000 or FFFF in TOS
+	LD	C,A
+	mNEXT
+
+;   U<          ( u u -- t )
+;               Unsigned compare of top two items.
+
+
+;   <           ( n1 n2 -- t )
+;               Signed compare of top two items.
+
+
+;   MAX         ( n n -- n )
+;               Return the greater of two top stack items.
+
+
+;   MIN         ( n n -- n )
+;               Return the smaller of top two stack items.
+
+
+;   WITHIN      ( u ul uh -- t )
+;               Return true if u is within the range of ul and uh.
+
+
+;; Divide
+
+;   UM/MOD      ( udl udh u -- ur uq )
+;               Unsigned divide of a double by a single. Return mod and quotient.
+
+
+;   M/MOD       ( d n -- r q )
+;               Signed floored divide of double by single. Return mod and quotient.
+
+
+;   /MOD        ( n n -- r q )
+;               Signed divide. Return mod and quotient.
+
+
+;   MOD         ( n n -- r )
+;               Signed divide. Return mod only.
+
+
+;   /           ( n n -- q )
+;               Signed divide. Return quotient only.
+
+
+;; Multiply
+
+;   UM*         ( u u -- ud )
+;               Unsigned multiply. Return double product.
+
+;   *           ( n n -- n )
+;               Signed multiply. Return single product.
+
+;   M*          ( n n -- d )
+;               Signed multiply. Return double product.
+
+
+;   */MOD       ( n1 n2 n3 -- r q )
+;               Multiply n1 and n2, then divide by n3. Return mod and quotient.
+
+;   */          ( n1 n2 n3 -- q )
+;               Multiply n1 by n2, then divide by n3. Return quotient only.
+
+;; Miscellaneous
+
+;   CELL+       ( a -- a )
+;               Add cell size in byte to address.
+
+;   CELL-       ( a -- a )
+;               Subtract cell size in byte from address.
+
+;   CELLS       ( n -- n )
+;               Multiply tos by cell size in bytes.
+
+;   ALIGNED     ( b -- a )
+;               Align address to the cell boundary.
+
+;   BL          ( -- 32 )
+;               Return 32, the blank character.
+
+
+;   >CHAR       ( c -- c )
+;               Filter non-printing characters.
+
+
+;   DEPTH       ( -- n )
+;               Return the depth of the data stack.
+
+
+;   PICK        ( ... +n -- ... w )
+;               Copy the nth stack item to tos.
+
+
+;; Tools
+
+;   _TYPE       ( b u -- )
+;               Display a string. Filter non-printing characters.
+
+
+;   dm+         ( a u -- a )
+;               Dump u bytes from , leaving a+u on the stack.
+
+
+;   DUMP        ( a u -- )
+;               Dump u bytes from a, in a formatted manner.
+
+
+;   .S          ( ... -- ... )
+;               Display the contents of the data stack.
+
+
+;   !CSP        ( -- )
+;               Save stack pointer in CSP for error checking.
+
+
+;   ?CSP        ( -- )
+;               Abort if stack pointer differs from that saved in CSP.
+
+
+;   >NAME       ( ca -- na | F )
+;               Convert code address to a name address.
+
+
+;   .ID         ( na -- )
+;               Display the name at address.
+
+
+;   SEE         ( -- ; <string> )
+;               A simple decompiler.
+
+
+;   WORDS       ( -- )
+;               Display the names in the context vocabulary.
+
+
+;   COLD        ( -- )
+;               The hilevel cold start sequence.
+
+
+
+
