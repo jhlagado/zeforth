@@ -31,10 +31,10 @@ mCOLON  4,'DUMP',DUMP
     DW      DOLIT,16,SLASH          ;change count to lines
     DW      TOR                     ;start count down loop
 DUMP1:          
-    DW      CR,DOLIT,16,TwoDUP,DMP    ;display numeric
+    DW      CR,DOLIT,16,DDUP,DMP    ;display numeric
     DW      ROT,ROT
     DW      SPACE,SPACE,UTYPE       ;display printable characters
-    DW      NUFQ,INVERT              ;user control
+    DW      NUFQ,INVER              ;user control
     DW      QBRAN,DUMP2
     DW      DONXT,DUMP1             ;loop till done
     DW      BRAN,DUMP3

@@ -51,7 +51,7 @@ mCODE	4, 'OVER', OVER
 
 ;   ?DUP        ( w -- w w | 0 )
 ;               Dup tos if its is not zero.
-mCOLON	4,'?DUP', QuestionDUP
+mCOLON	4,'?DUP', QDUP
 	DW	DUPP, QBRAN, QDUP1
 	DW	DUPP
 QDUP1:		
@@ -64,12 +64,12 @@ mCOLON	3,'ROT', ROT
 
 ;   2DROP       ( w w -- )
 ;               Discard two items on stack.
-mCOLON	5,'2DROP',TwoDROP
+mCOLON	5,'2DROP',DDROP
     DW	DROP, DROP, EXIT
 
 ;   2DUP        ( w1 w2 -- w1 w2 w1 w2 )
 ;               Duplicate top two items.
-mCOLON	4,'2DUP',TwoDUP
+mCOLON	4,'2DUP',DDUP
     DW	OVER, OVER, EXIT
 
 ;   2SWAP        ( w1 w2 w3 w4 -- w3 w4 w1 w2 )
@@ -81,11 +81,11 @@ mCOLON	5,'2SWAP',TwoSWAP
 ;               Copy the nth stack item to tos.
 mCOLON  4,'PICK',PICK
     DW  DOLIT,1,PLUS,CELLS
-    DW  SPFetch,PLUS,AT,EXIT
+    DW  SPAT,PLUS,AT,EXIT
 
 ;   DEPTH       ( -- n )
 ;               Return the depth of the data stack.
 mCOLON	5,'DEPTH',DEPTH
-	DW	SPFetch,SZero,AT,SWAP,Minus
+	DW	SPAT,SZero,AT,SWAP,SUBB
 	DW	DoLIT,CELLL,Slash,EXIT
 

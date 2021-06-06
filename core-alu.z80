@@ -7,7 +7,7 @@ mCODE	2,'2*',TwoStar
 
 ;   0<          ( n -- t )
 ;               Return true if n is negative.
-mCODE	2,'0<', ZeroLess
+mCODE	2,'0<', ZLESS
 	SLA B	; sign bit -> cy flag
 	SBC	A,A	; propagate cy through A
 	LD	B,A	; put 0000 or FFFF in TOS
@@ -63,13 +63,13 @@ mCOLON	2,'D+',DPlus
 
 ;   NOT         ( w -- w )
 ;               One's complement of tos.
-mCOLON  3, 'NOT', INVERT
+mCOLON  3, 'NOT', INVER
     DW  DoLIT, -1, XORR, EXIT
 
-;   NEGATE      ( n -- -n )
+;   NEGAT      ( n -- -n )
 ;               Two's complement of tos.
-mCOLON	6,'NEGATE',NEGATE
-    DW	INVERT, OnePlus, EXIT
+mCOLON	6,'NEGAT',NEGAT
+    DW	INVER, OnePlus, EXIT
 
 ;   1+		( n1|u1 -- n2|u2 )		
 ;		Increase top of the stack item by 1.
@@ -79,26 +79,26 @@ mCOLON	2,'1+',OnePlus
 ;   DNEGATE     ( d -- -d )
 ;               Two's complement of top double.
 mCOLON	7,'DNEGATE',DNEGATE
-	DW	INVERT, ToR, INVERT
+	DW	INVER, ToR, INVER
 	DW	DoLIT, 1, UMPlus
 	DW	RFrom, Plus, EXIT
 
 ;   -           ( n1 n2 -- n1-n2 )
 ;               Subtraction.
-mCOLON	1, '-', Minus
-	DW	NEGATE,Plus,EXIT
+mCOLON	1, '-', SUBB
+	DW	NEGAT,Plus,EXIT
 
 ;   ABS         ( n -- n )
 ;               Return the absolute value of n.
 mCOLON	3,'ABS',ABSS
-    DW	DUPP, ZeroLess, QBRAN, ABS1
-    DW	NEGATE
+    DW	DUPP, ZLESS, QBRAN, ABS1
+    DW	NEGAT
 ABS1:		
     DW	EXIT
 
 ;   =           ( w w -- t )
 ;               Return true if top two are equal.
-mCOLON	1, '=', Equals
+mCOLON	1, '=', EQUAL
 	DW	XORR, ZeroEquals, EXIT
 
 ;   0=		( x -- flag )			\ CORE
@@ -116,11 +116,11 @@ mCODE	2,'0=',ZeroEquals,_FLINK
 ;   U<          ( u u -- t )
 ;               Unsigned compare of top two items.
 mCOLON	2,'U<',ULess
-	DW	TwoDUP,XORR,ZeroLess
+	DW	DDUP,XORR,ZLESS
 	DW	QBRAN,ULES1
-	DW	NIP,ZeroLess,EXIT
+	DW	NIP,ZLESS,EXIT
 ULES1:		
-    DW	Minus,ZeroLess,EXIT
+    DW	SUBB,ZLESS,EXIT
 
 ;   NIP 	( n1 n2 -- n2 ) 		\ CORE EXT
 ;		Discard the second stack item.
@@ -129,21 +129,21 @@ mCOLON	3,'NIP',NIP
 
 ;   <           ( n1 n2 -- t )
 ;               is less than
-mCOLON	1,'<',LessThan
-	DW	TwoDUP, XORR, ZeroLess, QBRAN, LESS1
-	DW	DROP, ZeroLess, EXIT
+mCOLON	1,'<',LESS
+	DW	DDUP, XORR, ZLESS, QBRAN, LESS1
+	DW	DROP, ZLESS, EXIT
 LESS1:		
-    DW	Minus, ZeroLess, EXIT
+    DW	SUBB, ZLESS, EXIT
 
 ;   >           ( n1 n2 -- t )
 ;               is greater than
 mCOLON	1,'>',GreaterThan
-	DW	SWAP,LessThan,EXIT
+	DW	SWAP,LESS,EXIT
 
 ;   MAX         ( n n -- n )
 ;               Return the greater of two top stack items.
 mCOLON	3,'MAX',MAX
-	DW	TwoDUP, LessThan, QBRAN, MAX1
+	DW	DDUP, LESS, QBRAN, MAX1
     DW	SWAP
 MAX1:		
     DW	DROP,EXIT
@@ -151,16 +151,16 @@ MAX1:
 ;   MIN         ( n n -- n )
 ;               Return the smaller of top two stack items.
 mCOLON	3,'MIN',MIN
-	DW	TwoDUP,GreaterThan,QBRAN,MIN1
+	DW	DDUP,GreaterThan,QBRAN,MIN1
 	DW	SWAP
 MIN1:		
     DW	DROP,EXIT
 
 ;   WITHIN      ( u ul uh -- t )
 ;               Return true if u is within the range of ul and uh.
-mCOLON	6,'WITHIN',WITHIN
-	DW	OVER,Minus,ToR			;ul <= u < uh
-	DW	Minus,RFrom,ULess,EXIT
+mCOLON	6,'WITHIN',WITHI
+	DW	OVER,SUBB,ToR			;ul <= u < uh
+	DW	SUBB,RFrom,ULess,EXIT
 
 ;   UM+         ( w w -- w cy )
 ;               Add two numbers, return the sum and carry flag.
@@ -222,10 +222,10 @@ UMMOD12:
 	mNEXT
 UMMOD2:		
     LD	BC,ERR_DIVZERO ; divide by 0
-	JP	THROW
+	JP	THROWX
 UMMOD1:		
     LD	BC,ERR_OUTOFRANGE ; result out of range
-	JP	THROW
+	JP	THROWX
 UMMOD4:		
     LD	E,A
 	LD	A,H
@@ -264,36 +264,36 @@ UMMOD15:
 ;		and quotient n3.
 ; TODO: this is usually called M/MOD in eForth
 mCOLON	6,'FM/MOD',FMSlashMOD
-	DW	DUPP,ToR,TwoDUP,XORR,ToR,ToR,DUPP,ZeroLess
+	DW	DUPP,ToR,DDUP,XORR,ToR,ToR,DUPP,ZLESS
 	DW	QBRAN,FMMOD1
 	DW	DNEGATE
 FMMOD1:
     DW	rat,ABSS,UMSlashMOD2
-	DW	RFrom,ZeroLess,QBRAN,FMMOD2
-	DW	SWAP,NEGATE,SWAP
+	DW	RFrom,ZLESS,QBRAN,FMMOD2
+	DW	SWAP,NEGAT,SWAP
 FMMOD2:
-    DW	RFrom,ZeroLess,QBRAN,FMMOD3
-	DW	NEGATE,OVER,QBRAN,FMMOD4
-	DW	rat,ROT,Minus,SWAP,OneMinus
+    DW	RFrom,ZLESS,QBRAN,FMMOD3
+	DW	NEGAT,OVER,QBRAN,FMMOD4
+	DW	rat,ROT,SUBB,SWAP,OneSUBB
 FMMOD4:
     DW	RFrom,DROP
-	DW	DoLIT,0,OVER,LessThan,QBRAN,FMMOD6
-	DW	DoLIT,ERR_OUTOFRANGE,THROW
+	DW	DoLIT,0,OVER,LESS,QBRAN,FMMOD6
+	DW	DoLIT,ERR_OUTOFRANGE,THROWX
 FMMOD6:
     DW	EXIT
 FMMOD3:
-    DW	RFrom,DROP,DUPP,ZeroLess,QBRAN,FMMOD6
-	DW	DoLIT,ERR_OUTOFRANGE,THROW
+    DW	RFrom,DROP,DUPP,ZLESS,QBRAN,FMMOD6
+	DW	DoLIT,ERR_OUTOFRANGE,THROWX
 
 ;   1-		( n1|u1 -- n2|u2 )		\ COR
 ;		Decrease top of the stack item by 1.
-mCOLON	2,'1-',OneMinus,_FLINK
+mCOLON	2,'1-',OneSUBB,_FLINK
 	DW	DoLIT,-1,Plus,EXIT
 
 ;   S>D 	( n -- d )			\ CORE
 ;		Convert a single-cell number n to double-cell number.
 mCOLON	3,'S>D',SToD,_FLINK
-	DW	DUPP,ZeroLess,EXIT
+	DW	DUPP,ZLESS,EXIT
 
 ;   /MOD        ( n n -- r q )
 ;               Signed divide. Return mod and quotient.
@@ -348,7 +348,7 @@ mCOLON	1,'*',Star
 ;   M*          ( n n -- d )
 ;               Signed multiply. Return double product.
 mCOLON	2,'M*',MStar,
-	DW	TwoDUP,XORR,ZeroLess,ToR,ABSS,SWAP,ABSS
+	DW	DDUP,XORR,ZLESS,ToR,ABSS,SWAP,ABSS
 	DW	UMStar,RFrom,QBRAN,MSTAR1
 	DW	DNEGATE
 MSTAR1:		
@@ -371,7 +371,7 @@ mCOLON	5,'CELL+',CELLP
 
 ;   CELL-       ( a -- a )
 ;               Subtract cell size in byte from address.
-mCOLON	5,'CELL-',CELLMinus
+mCOLON	5,'CELL-',CELLM
 	DW	DOLIT, -CELLL, PLUS, EXIT
 
 ;   CELLS       ( n -- n )
@@ -384,7 +384,3 @@ mCOLON	5,'CELLS',CELLS
 ;
 mCOLON	5,'CHAR+',CHARPlus
     DW	DoLIT,CHARR,Plus,EXIT
-
-mCOLON  5,'COUNT',COUNT
-    DW      DUPP,DOLIT,1,PLUS
-    DW      SWAP,CAT,EXIT

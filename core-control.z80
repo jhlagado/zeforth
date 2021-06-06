@@ -63,5 +63,5 @@ mCOLON  IMEDD+5,'AGAIN',AGAIN
 ;		An UNLOOP is required for each nesting level before the
 ;		definition may be EXITed.
 mCOLON	COMPO+6,'UNLOOP',UNLOOP
-	DW	RFrom,RFrom,RFrom,TwoDROP,ToR,EXIT
+	DW	RFrom,RFrom,RFrom,DDROP,ToR,EXIT
 

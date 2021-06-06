@@ -59,7 +59,7 @@ mCOLON  4, 'EMIT', EMIT
 mCOLON  4,'NUF?',NUFQ
     DW      QKEY,DUPP
     DW      QBRAN,NUFQ1
-    DW      TwoDROP,KEY,DoLIT,CRR,Equals
+    DW      DDROP,KEY,DoLIT,CRR,EQUAL
 NUFQ1:          
     DW      EXIT
 
@@ -76,7 +76,7 @@ mCOLON  5,'SPACE',SPACE
 ;   SPACES      ( +n -- )
 ;               Send n spaces to the output device.
 mCOLON  6,'SPACES',SPACES
-	DW	QuestionDUP,QBRAN,SPACES2
+	DW	QDUP,QBRAN,SPACES2
     DW	DoLIT,0,DoDO
 SPACES1: 	
     DW	SPACE,DoLOOP,SPACES1
@@ -126,7 +126,7 @@ mCOLON  COMPO+3,'.||',DOTQP
 ;               Display an unsigned integer in n column, right justified.
 mCOLON  3,'U.R',UDOTR
     DW  TOR,BDIGS,DIGS,EDIGS
-    DW  RFROM,OVER,Minus
+    DW  RFROM,OVER,SUBB
     DW  SPACES,TYPEE,EXIT
 
 ;   U.          ( u -- )

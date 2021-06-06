@@ -1,7 +1,7 @@
 ;   DIGIT       ( u -- c )
 ;               Convert digit u to a character.
 mCOLON  5,'DIGIT',DIGIT
-    DW      DOLIT,9,OVER,LessThan
+    DW      DOLIT,9,OVER,LESS
     DW      DOLIT,7,ANDD,PLUS
     DW      DOLIT,'0',PLUS,EXIT
 
@@ -21,7 +21,7 @@ mCOLON  2,'<#',BDIGS
 ;   HOLD        ( c -- )
 ;               Insert a character into the numeric output string.
 mCOLON  4,'HOLD',HOLD
-    DW      HLD,AT,DOLIT,1,Minus
+    DW      HLD,AT,DOLIT,1,SUBB
     DW      DUPP,HLD,STORE,CStore,EXIT
 
 ;   #           ( u -- u )
@@ -42,7 +42,7 @@ DIGS2:
 ;   SIGN        ( n -- )
 ;               Add a minus sign to the numeric output string.
 mCOLON	4,'SIGN',SIGN
-	DW	ZeroLess,QBRAN,SIGN1
+	DW	ZLESS,QBRAN,SIGN1
 	DW	DoLIT,MINUSS,HOLD
 SIGN1:		
     DW	EXIT
@@ -52,7 +52,7 @@ SIGN1:
 ;               Prepare the output string to be TYPE'd.
 mCOLON  2,'#>',EDIGS
     DW      DROP,HLD,AT
-    DW      PAD,OVER,Minus,EXIT
+    DW      PAD,OVER,SUBB,EXIT
 
 
 ;   str         ( n -- b u )
@@ -83,7 +83,7 @@ mCOLON	2,'BL',BLANK
 mCOLON  5,'>CHAR',TCHAR
     DW      DoLIT,$7F,ANDD,DUPP    ;mask msb
     DW      DoLIT,127
-    DW      DoLIT,SPACEE,WITHIN    ;check for printable
+    DW      DoLIT,SPACEE,WITHI    ;check for printable
     DW      QBRAN,TCHA1
     DW      DROP,DoLIT,UNDERSC          ;replace non-printables
 TCHA1:          

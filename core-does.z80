@@ -62,7 +62,7 @@ mCODE	COMPO+4, 'EXIT', EXIT
 
 mCOLON	COMPO+4,'doDO',DoDO
 	DW	ToR,DoLIT,MaxNegative,Plus,RFrom
-	DW	OVER,Minus,SWAP,RFrom,SWAP,ToR,SWAP,ToR,ToR,EXIT
+	DW	OVER,SUBB,SWAP,RFrom,SWAP,ToR,SWAP,ToR,ToR,EXIT
 
 ;   doLOOP	( -- ) ( R: loop-sys1 -- | loop-sys2 )
 ;		Run time routine for LOOP.

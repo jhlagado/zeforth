@@ -51,6 +51,7 @@ VVCODE      .SET    $
             .INCLUDE "core-control.z80" 
             .INCLUDE "core-does.z80" 
             .INCLUDE "core-format.z80" 
+            .INCLUDE "core-interpret.z80" 
             .INCLUDE "core-io.z80" 
             .INCLUDE "core-kernel.z80" 
             .INCLUDE "core-memory.z80" 

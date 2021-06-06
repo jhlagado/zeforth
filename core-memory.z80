@@ -48,7 +48,7 @@ mCODE	COMPO+2,'R@',RAT
 
 ;   RP@         ( -- a )
 ;               Push the current RP to the data stack
-mCODE	COMPO+3, 'rp@', RPFetch
+mCODE	COMPO+3, 'rp@', RPAT
     DB	0C5h	; PUSH	BC	;11t
     DB	0DDh,0E5h ; PUSH IX	;15t
     DB	0C1h	; POP	BC	;10t
@@ -57,7 +57,7 @@ mCODE	COMPO+3, 'rp@', RPFetch
 
 ;   RP!         ( a -- )
 ;               Set the return stack pointer.
-mCODE	COMPO+3,'rp!',RPStore
+mCODE	COMPO+3,'rp!',RPSTO
 	DB	0C5h	; PUSH	BC	;11t
 	DB	0DDh,0E1h ; POP IX	;14t
 	DB	0C1h	; POP	BC	;10t
@@ -65,7 +65,7 @@ mCODE	COMPO+3,'rp!',RPStore
 
 ;   SP@         ( -- a )
 ;               Push the current data stack pointer.
-mCODE	3, 'sp@', SPFetch
+mCODE	3, 'sp@', SPAT
 	DB	0C5h	; PUSH	BC	;11t
 	DB	021h	; LD	HL,0	;10t
 	DW	0
@@ -76,7 +76,7 @@ mCODE	3, 'sp@', SPFetch
 
 ;   SP!         ( a -- )
 ;               Set the data stack pointer.
-mCODE	3,'sp!',SPStore
+mCODE	3,'sp!',SPSTO
 	DB	060h	; LD	H,B	; 4t
 	DB	069h	; LD	L,C	; 4t
 	DB	0F9h	; LD	SP,HL	; 6t
@@ -93,13 +93,15 @@ mCODE	3,'sp!',SPStore
 
 
 ;   2@          ( a -- d )
-;               Fetch double integer from address a.
+;               AT double integer from address a.
 
  
 ;   COUNT       ( b -- b +n )
 ;               Return count byte of a string and add 1 to byte address.
+mCOLON  5,'COUNT',COUNT
+    DW      DUPP,DOLIT,1,PLUS
+    DW      SWAP,CAT,EXIT
 
- 
 ;   HERE        ( -- a )
 ;               Return the top of the code dictionary.
 mCOLON  4,'HERE',HERE
@@ -139,6 +141,6 @@ mCOLON  7,'ALIGNED', ALGND
     DW      DUPP,DOLIT,0,DOLIT,CELLL
     DW      UMMOD,DROP,DUPP
     DW      QBRAN,ALGN1
-    DW      DoLIT,CELLL,SWAP,Minus
+    DW      DoLIT,CELLL,SWAP,SUBB
 ALGN1:          
     DW      PLUS,EXIT

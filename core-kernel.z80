@@ -50,8 +50,8 @@ mCODE	3,'TYPESZ',TypeCStr
     pop BC
     mNEXT
 
-;   THROW    ( cstr -- )
+;   THROWX    ( cstr -- )
 ;   Prints string message and returns TODO: restart Forth interpreter QUIT
-mCOLON	5,'THROW',THROW
+mCOLON	5,'THROWX',THROWX
 	DW  TypeCStr, EXIT
 
