@@ -22,7 +22,7 @@ mCOLON  2,'<#',BDIGS
 ;               Insert a character into the numeric output string.
 mCOLON  4,'HOLD',HOLD
     DW      HLD,AT,DOLIT,1,SUBB
-    DW      DUPP,HLD,STORE,CStore,EXIT
+    DW      DUPP,HLD,STORE,CSTOR,EXIT
 
 ;   #           ( u -- u )
 ;               Extract one digit from u and append the digit to output string.

@@ -38,7 +38,7 @@ mCODE	3,'TX!',TXSTO
 ;   ?KEY        ( -- c T | F )
 ;               Return input character and true, or a false if no input.
 mCOLON  4,'?KEY',QKEY
-    DW  TQKEY,AT,EXECUTE,EXIT
+    DW  TQKEY,AT,EXECU,EXIT
 
 ;   KEY         ( -- c )
 ;               Wait for and return an input character.
@@ -51,7 +51,7 @@ KEY1:
 ;   EMIT        ( c -- )
 ;               Send a character to the output device.
 mCOLON  4, 'EMIT', EMIT
-    DW	TEMIT, AT, EXECUTE, EXIT
+    DW	TEMIT, AT, EXECU, EXIT
 
 
 ;   NUF?        ( -- t )
@@ -75,16 +75,15 @@ mCOLON  5,'SPACE',SPACE
 
 ;   SPACES      ( +n -- )
 ;               Send n spaces to the output device.
-mCOLON  6,'SPACES',SPACES
-	DW	QDUP,QBRAN,SPACES2
-    DW	DoLIT,0,DoDO
-SPACES1: 	
-    DW	SPACE,DoLOOP,SPACES1
-SPACES2: 	
-    DW	EXIT
+mCOLON  6,'SPACES',SPACS
+    DW      DOLIT,0,MAX,TOR
+    DW      BRAN,CHAR2
+CHAR1:          
+    DW      SPACE
+CHAR2:          
+    DW      DONXT,CHAR1
+    DW      EXIT
 
-;   TYPE        ( b u -- )
-;               Output u characters from b.
 ;   TYPE        ( b u -- )
 ;               Output u characters from b.
 mCOLON	4,'TYPE',TYPEE
@@ -96,7 +95,6 @@ TYPE1:
 TYPE2:          
     DW      DONXT,TYPE1
     DW      DROP,EXIT
-
 
 ;   CR          ( -- )
 ;               Output a carriage return and a line feed.
@@ -112,7 +110,8 @@ mCOLON  COMPO+3,'do$',DOSTR
 
 ;   $"|         ( -- a )
 ;               Run time routine compiled by $". Return address of a compiled string.
-
+mCOLON  COMPO+3,'$||',STRQP
+    DW      DOSTR,EXIT              ;force a call to do$
 
 ;   ."|         ( -- )
 ;               Run time routine of ." . Output a compiled string.
@@ -121,20 +120,22 @@ mCOLON  COMPO+3,'.||',DOTQP
 
 ;   .R          ( n +n -- )
 ;               Display an integer in a field of n columns, right justified.
+mCOLON  2,'.R',DOTR
+    DW      TOR,STR,RFROM,OVER,SUBB
+    DW      SPACS,TYPEE,EXIT
 
 ;   U.R         ( u +n -- )
 ;               Display an unsigned integer in n column, right justified.
 mCOLON  3,'U.R',UDOTR
     DW  TOR,BDIGS,DIGS,EDIGS
     DW  RFROM,OVER,SUBB
-    DW  SPACES,TYPEE,EXIT
+    DW  SPACS,TYPEE,EXIT
 
 ;   U.          ( u -- )
 ;               Display an unsigned integer in free format.
 mCOLON  2,'U.',UDOT
     DW      BDIGS,DIGS,EDIGS
     DW      SPACE,TYPEE,EXIT
-
 
 ;   .           ( w -- )
 ;               Display an integer in free format, preceeded by a space.
@@ -145,34 +146,78 @@ mCOLON  1,'.',DOT
 DOT1:           
     DW      STR,SPACE,TYPEE,EXIT    ;yes, display signed
 
-;   .(          ( -- )
-;               Output following string up to next ) .
+; ;   .(          ( -- )
+; ;               Output following string up to next ) .
+; mCOLON  IMEDD+2,'.(',DOTPR
+;     DW      DOLIT,')',PARSE,TYPEE,EXIT
 
 ;   ?           ( a -- )
 ;               Display the contents in a memory cell.
-
-;; Terminal response
+mCOLON  1,'?',QUEST
+    DW      AT,DOT,EXIT
 
 ;   ^H          ( bot eot cur -- bot eot cur )
 ;               Backup the cursor by one character.
 
+mCOLON  2,'^H',BKSP
+    DW      TOR,OVER,RFROM,SWAP,OVER,XORR
+    DW      QBRAN,BACK1
+    DW      DOLIT,BKSPP,TECHO,ATEXE,DOLIT,1,SUBB
+    DW      BLANK,TECHO,ATEXE
+    DW      DOLIT,BKSPP,TECHO,ATEXE
+BACK1:          
+    DW      EXIT
 
 ;   TAP         ( bot eot cur c -- bot eot cur )
 ;               Accept and echo the key stroke and bump the cursor.
 
+mCOLON  3,'TAP',TAP
+    DW      DUPP,TECHO,ATEXE
+    DW      OVER,CSTOR,DOLIT,1,PLUS,EXIT
 
 ;   kTAP        ( bot eot cur c -- bot eot cur )
 ;               Process a key stroke, CR or backspace.
 
+mCOLON  4,'kTAP',KTAP
+    DW      DUPP,DOLIT,CRR,XORR
+    DW      QBRAN,KTAP2
+    DW      DOLIT,BKSPP,XORR
+    DW      QBRAN,KTAP1
+    DW      BLANK,TAP,EXIT
+KTAP1:          
+    DW      BKSP,EXIT
+KTAP2:          
+    DW      DROP,SWAP,DROP,DUPP,EXIT
 
 ;   accept      ( b u -- b u )
 ;               Accept characters to input buffer. Return with actual count.
 
+mCOLON  6,'accept',ACCEP
+    DW      OVER,PLUS,OVER
+ACCP1:          
+    DW      DDUP,XORR
+    DW      QBRAN,ACCP4
+    DW      KEY,DUPP
+    DW      BLANK,DOLIT,127,WITHI
+    DW      QBRAN,ACCP2
+    DW      TAP
+    DW      BRAN,ACCP3
+ACCP2:          
+    DW      TTAP,ATEXE
+ACCP3:          
+    DW      BRAN,ACCP1
+ACCP4:          
+    DW      DROP,OVER,SUBB,EXIT
 
 ;   EXPECT      ( b u -- )
 ;               Accept input stream and store count in SPAN.
 
+mCOLON  6,'EXPECT',EXPEC
+    DW      TEXPE,ATEXE,SPAN,STORE,DROP,EXIT
 
 ;   QUERY       ( -- )
 ;               Accept input stream to terminal input buffer.
 
+mCOLON  5,'QUERY',QUERY
+    DW      TIB,DOLIT,80,TEXPE,ATEXE,NTIB,STORE
+    DW      DROP,DOLIT,0,INN,STORE,EXIT

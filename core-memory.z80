@@ -22,7 +22,7 @@ mCODE	1,'@', AT
 
 ;   C!          ( c b -- )
 ;               Pop the data stack to byte memory.
-mCODE	2,'C!',CStore
+mCODE	2,'C!',CSTOR
 	LD	H,B
 	LD	L,C
 	POP	BC
@@ -86,16 +86,22 @@ mCODE	3,'sp!',SPSTO
 
 ;   +!          ( n a -- )
 ;               Add n to the contents at address a.
-
+mCOLON  2,'+!',PSTOR
+    DW      SWAP,OVER,AT,PLUS
+    DW      SWAP,STORE,EXIT
 
 ;   2!          ( d a -- )
 ;               Store the double integer to address a.
-
+mCOLON  2,'2!',DSTOR
+    DW      SWAP,OVER,STORE
+    DW      CELLP,STORE,EXIT
 
 ;   2@          ( a -- d )
-;               AT double integer from address a.
+;               Fetch double integer from address a.
+mCOLON  2,'2@',DAT
+    DW      DUPP,CELLP,AT
+    DW      SWAP,AT,EXIT
 
- 
 ;   COUNT       ( b -- b +n )
 ;               Return count byte of a string and add 1 to byte address.
 mCOLON  5,'COUNT',COUNT
@@ -115,25 +121,71 @@ mCOLON  3,'PAD',PAD
 ;   TIB         ( -- a )
 ;               Return the address of the terminal input buffer.
 
+mCOLON  3,'TIB',TIB
+    DW      NTIB,CELLP,AT,EXIT
 
 ;   @EXECUTE    ( a -- )
 ;               Execute vector stored in address a.
 
+mCOLON  8,'@EXECUTE',ATEXE
+    DW      AT,QDUP                 ;?address or zero
+    DW      QBRAN,EXE1
+    DW      EXECU                   ;execute if non-zero
+EXE1:           
+    DW      EXIT                    ;do nothing if zero
 
 ;   CMOVE       ( b1 b2 u -- )
 ;               Copy u bytes from b1 to b2.
 
+mCOLON  5,'CMOVE',CMOVE
+    DW      TOR
+    DW      BRAN,CMOV2
+CMOV1:          
+    DW      TOR,DUPP,CAT
+    DW      RAT,CSTOR
+    DW      DOLIT,1,PLUS
+    DW      RFROM,DOLIT,1,PLUS
+CMOV2:          
+    DW      DONXT,CMOV1
+    DW      DDROP,EXIT
 
 ;   FILL        ( b u c -- )
 ;               Fill u bytes of character c to area beginning at b.
 
+mCOLON  4,'FILL',FILL
+    DW      SWAP,TOR,SWAP
+    DW      BRAN,FILL2
+FILL1:          
+    DW      DDUP,CSTOR,DOLIT,1,PLUS
+FILL2:          
+    DW      DONXT,FILL1
+    DW      DDROP,EXIT
 
 ;   -TRAILING   ( b u -- b u )
 ;               Adjust the count to eliminate trailing white space.
 
+mCOLON  9,'-TRAILING',DTRAI
+    DW      TOR
+    DW      BRAN,DTRA2
+DTRA1:          
+    DW      BLANK,OVER,RAT,PLUS,CAT,LESS
+    DW      QBRAN,DTRA2
+    DW      RFROM,DOLIT,1,PLUS,EXIT ;adjusted count
+DTRA2:          
+    DW      DONXT,DTRA1
+    DW      DOLIT,0,EXIT            ;count=0
 
 ;   PACK$       ( b u a -- a )
 ;               Build a counted string with u characters from b. Null fill.
+
+mCOLON  5,'PACK$',PACKS
+    DW      ALGND,DUPP,TOR          ;strings only on cell boundary
+    DW      OVER,DUPP,DOLIT,0
+    DW      DOLIT,CELLL,UMMOD,DROP  ;count mod cell
+    DW      SUBB,OVER,PLUS
+    DW      DOLIT,0,SWAP,STORE      ;null fill cell
+    DW      DDUP,CSTOR,DOLIT,1,PLUS ;save count
+    DW      SWAP,CMOVE,RFROM,EXIT   ;move string
 
 ;   ALIGNED     ( b -- a )
 ;               Align address to the cell boundary.
