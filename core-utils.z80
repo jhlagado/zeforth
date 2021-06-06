@@ -54,7 +54,7 @@ DOTS1:
     DW      RAT,PICK,DOT            ;index stack, display contents
 DOTS2:          
     DW      DONXT,DOTS1             ;loop till done
-    mDSTRING DOTQP,' <sp'
+    mDSTR DOTQP,' <sp'
     DW      EXIT
 
 

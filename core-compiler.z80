@@ -1,10 +1,16 @@
-;   '           ( -- ca )
-;               Search context vocabularies for the next word in input stream.
+; ;   '           ( -- ca )
+; ;               Search context vocabularies for the next word in input stream.
+; mCOLON  1,"'",TICK
+;     DW      TOKEN,NAMEQ             ;?defined
+;     DW      QBRAN,TICK1
+;     DW      EXIT                    ;yes, push code address
+; TICK1:          
+;     DW      THROW                   ;no, error
 
-
-;   ALLOT       ( n -- )
-;               Allocate n bytes to the code dictionary.
-
+; ;   ALLOT       ( n -- )
+; ;               Allocate n bytes to the code dictionary.
+; mCOLON  5,'ALLOT',ALLOT
+;     DW      CP,PSTOR,EXIT           ;adjust code pointer
 
 ;   ,           ( w -- )
 ;               Compile an integer into the code dictionary.
@@ -13,10 +19,10 @@ mCOLON  1,',',COMMA
     DW      CP,STORE,STORE,EXIT     ;adjust code pointer, compile
 
 
-;   [COMPILE]   ( -- ; <string> )
-;               Compile the next immediate word into code dictionary.
-mCOLON  IMEDD+9,'[COMPILE]',BCOMP
-    ; DW      TICK,COMMA,EXIT
+; ;   [COMPILE]   ( -- ; <string> )
+; ;               Compile the next immediate word into code dictionary.
+; mCOLON  IMEDD+9,'[COMPILE]',BCOMP
+;     DW      TICK,COMMA,EXIT
 
 
 ;   COMPILE     ( -- )
@@ -28,67 +34,127 @@ mCOLON  COMPO+7,'COMPILE',COMPI
 
 ;   LITERAL     ( w -- )
 ;               Compile tos to code dictionary as an integer literal.
-
-
-;   $,"         ( -- )
-;               Compile a literal string up to next " .
-
+mCOLON  IMEDD+7,'LITERAL',LITER
+    DW      COMPI,DOLIT,COMMA,EXIT
+    
+; ;   $,"         ( -- )
+; ;               Compile a literal string up to next " .
+; mCOLON  3,'$,|',STRCQ
+;     DW      DOLIT,$22,WORDD         ;move string to code dictionary
+;     DW      COUNT,PLUS,ALGND        ;calculate aligned end of string
+;     DW      CP,STORE,EXIT           ;adjust the code pointer
 
 ;   RECURSE     ( -- )
 ;               Make the current word available for compilation.
-
-
-;; Name compiler
+mCOLON  IMEDD+7,'RECURSE',RECUR
+    DW      LAST,AT,NAMET,COMMA,EXIT
 
 ;   ?UNIQUE     ( a -- a )
 ;               Display a warning message if the word already exists.
 
+mCOLON  7,'?UNIQUE',UNIQU
+    DW      DUPP,NAMEQ              ;?name exists
+    DW      QBRAN,UNIQ1             ;redefinitions are OK
+    mDSTR   DOTQP,' reDef '         ;but warn the user
+    DW      OVER,COUNT,TYPEE        ;just in case its not planned
+UNIQ1:          
+    DW      DROP,EXIT
 
 ;   $,n         ( na -- )
 ;               Build a new dictionary name using the string at na.
 
+mCOLON  3,'$,n',SNAME
+    DW      DUPP,CAT                ;?null input
+    DW      QBRAN,PNAM1
+    DW      UNIQU                   ;?redefinition
+    DW      DUPP,LAST,STORE         ;save na for vocabulary link
+    DW      HERE,ALGND,SWAP         ;align code address
+    DW      CELLM                   ;link address
+    DW      CRRNT,AT,AT,OVER,STORE
+    DW      CELLM,DUPP,NP,STORE     ;adjust name pointer
+    DW      STORE,EXIT              ;save code pointer
+PNAM1:          
+    mDSTR   STRQP,' name'           ;null input
+    DW      THROW
 
 ;; FORTH compiler
 
-;   $ COMPILE    ( a -- )
+;   $COMPILE    ( a -- )
 ;               Compile next word to code dictionary as a token or literal.
 
+mCOLON  8,'$COMPILE',SCOMP
+    DW      NAMEQ,QDUP              ;?defined
+    DW      QBRAN,SCOM2
+    DW      AT,DOLIT,IMEDD,ANDD     ;?immediate
+    DW      QBRAN,SCOM1
+    DW      EXECU,EXIT              ;its immediate, execute
+SCOM1:          
+    DW      COMMA,EXIT              ;its not immediate, compile
+SCOM2:          
+    DW      TNUMB,ATEXE             ;try to convert to number
+    DW      QBRAN,SCOM3
+    DW      LITER,EXIT              ;compile number as integer
+SCOM3:          DW      THROW                   ;error
 
 ;   OVERT       ( -- )
 ;               Link a new word into the current vocabulary.
 
+mCOLON  5,'OVERT',OVERT
+    DW      LAST,AT,CRRNT,AT,STORE,EXIT
 
 ;   ;           ( -- )
 ;               Terminate a colon definition.
 
+mCOLON  IMEDD+COMPO+1,';',SEMIS
+    DW      COMPI,EXIT,LBRAC,OVERT,EXIT
 
 ;   ]           ( -- )
 ;               Start compiling the words in the input stream.
 
+mCOLON  1,']',RBRAC
+    DW      DOLIT,SCOMP,TEVAL,STORE,EXIT
 
 ;   call,       ( ca -- )
 ;               Assemble a call instruction to ca.
 
+mCOLON  5,'call,',CALLC
+    DW      DOLIT,CALLL,COMMA       ;Direct Threaded Code
+    DW      COMMA,EXIT      ;DTC 8086 relative call
 
 ;   :           ( -- ; <string> )
 ;               Start a new colon definition using next word as its name.
 
+mCOLON  1,':',COLON
+    DW      TOKEN,SNAME,DOLIT,DoLIST
+    DW      CALLC,RBRAC,EXIT
 
 ;   IMMEDIATE   ( -- )
 ;               Make the last compiled word an immediate word.
 
+mCOLON  9,'IMMEDIATE',IMMED
+    DW      DOLIT,IMEDD,LAST,AT,AT,ORR
+    DW      LAST,AT,STORE,EXIT
 
 ;; Defining words
 
 ;   USER        ( u -- ; <string> )
 ;               Compile a new user variable.
 
+mCOLON  4,'USER',USER
+    DW      TOKEN,SNAME,OVERT
+    DW      DOLIT,DoLIST,CALLC
+    DW      COMPI,DOUSE,COMMA,EXIT
 
 ;   CREATE      ( -- ; <string> )
 ;               Compile a new array entry without allocating code space.
 
+mCOLON  6,'CREATE',CREAT
+    DW      TOKEN,SNAME,OVERT
+    DW      DOLIT,DoLIST,CALLC
+    DW      COMPI,DOVAR,EXIT
 
 ;   VARIABLE    ( -- ; <string> )
 ;               Compile a new variable initialized to 0.
 
-
+mCOLON  8,'VARIABLE',VARIA
+    DW      CREAT,DOLIT,0,COMMA,EXIT

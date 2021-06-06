@@ -40,7 +40,7 @@ aaLABEL:                                              ;;assembly label
     vvUSER .set vvUSER + CELLL
 .endm
 
-.macro mDSTRING, aaFUNC, aaSTR
+.macro mDSTR, aaFUNC, aaSTR
     DW aaFUNC                       ;;function
     vvLEN .set $                    ;;save address of count byte
     DB 0,aaSTR                      ;;count byte and string

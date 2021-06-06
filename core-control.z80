@@ -26,26 +26,42 @@ mCOLON  IMEDD+5,'AGAIN',AGAIN
 
 ;   IF          ( -- A )
 ;               Begin a conditional branch structure.
+mCOLON  IMEDD+2,'IF',IFF
+    DW      COMPI,QBRAN,HERE
+    DW      DOLIT,0,COMMA,EXIT
 
 
 ;   AHEAD       ( -- A )
 ;               Compile a forward branch instruction.
+mCOLON  IMEDD+5,'AHEAD',AHEAD
+    DW      COMPI,BRAN,HERE,DOLIT,0,COMMA,EXIT
 
 
 ;   REPEAT      ( A a -- )
 ;               Terminate a BEGIN-WHILE-REPEAT indefinite loop.
-
+mCOLON  IMEDD+6,'REPEAT',REPEA
+    DW      AGAIN,HERE,SWAP,STORE,EXIT
 
 ;   THEN        ( A -- )
 ;               Terminate a conditional branch structure.
+mCOLON  IMEDD+4,'THEN',THENN
+    DW      HERE,SWAP,STORE,EXIT
+
+;   AFT         ( a -- a A )
+;               Jump to THEN in a FOR-AFT-THEN-NEXT loop the 1st time through.
+
+mCOLON  IMEDD+3,'AFT',AFT
+    DW      DROP,AHEAD,BEGIN,SWAP,EXIT
 
 ;   ELSE        ( A -- A )
 ;               Start the false clause in an IF-ELSE-THEN structure.
-
+mCOLON  IMEDD+4,'ELSE',ELSEE
+    DW      AHEAD,SWAP,THENN,EXIT
 
 ;   WHILE       ( a -- A a )
 ;               Conditional branch out of a BEGIN-WHILE-REPEAT loop.
-
+mCOLON  IMEDD+5,'WHILE',WHILE
+    DW      IFF,SWAP,EXIT
 
 ;   ABORT"      ( -- ; <string> )
 ;               Conditional abort with an error message.
