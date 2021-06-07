@@ -12,7 +12,7 @@ UTYP2:
 
 ;   dm+         ( a u -- a )
 ;               Dump u bytes from , leaving a+u on the stack.
-mCOLON  3,'dm+',DMP
+hCOLON  3,'dm+',DMP
     DW      OVER,DOLIT,4,UDOTR      ;display address
     DW      SPACE,TOR               ;start count down loop
     DW      BRAN,PDUM2              ;skip first pass

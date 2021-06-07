@@ -1,17 +1,15 @@
 ;   DIGIT       ( u -- c )
 ;               Convert digit u to a character.
-mCOLON  5,'DIGIT',DIGIT
+hCOLON  5,'DIGIT',DIGIT
     DW      DOLIT,9,OVER,LESS
     DW      DOLIT,7,ANDD,PLUS
     DW      DOLIT,'0',PLUS,EXIT
 
 ;   EXTRACT     ( n base -- n c )
 ;               Extract the least significant digit from n.
-mCOLON  7,'EXTRACT',EXTRC
+hCOLON  7,'EXTRACT',EXTRC
     DW      DOLIT,0,SWAP,UMMOD
     DW      SWAP,DIGIT,EXIT
-
-
 
 ;   <#          ( -- )
 ;               Initiate the numeric output process.
@@ -57,7 +55,7 @@ mCOLON  2,'#>',EDIGS
 
 ;   str         ( n -- b u )
 ;               Convert a signed integer to a numeric string.
-mCOLON  3,'str',STR
+hCOLON  3,'str',STR
     DW      DUPP,TOR,ABSS
     DW      BDIGS,DIGS,RFROM
     DW      SIGN,EDIGS,EXIT
@@ -80,7 +78,7 @@ mCOLON	2,'BL',BLANK
 
 ;   >CHAR       ( c -- c )
 ;               Filter non-printing characters.
-mCOLON  5,'>CHAR',TCHAR
+hCOLON  5,'>CHAR',TCHAR
     DW      DoLIT,$7F,ANDD,DUPP    ;mask msb
     DW      DoLIT,127
     DW      DoLIT,SPACEE,WITHI    ;check for printable

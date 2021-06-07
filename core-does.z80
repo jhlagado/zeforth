@@ -1,6 +1,6 @@
 ;   doCONST	( -- x )
 ;	Run-time routine of CONSTANT and VARIABLE.
-mCODE	COMPO+7, 'doCONST', DoCONST
+hCODE	COMPO+7, 'doCONST', DoCONST
     POP	HL	                        ;10t
     PUSH BC	                        ;11t
     LD C,(HL)	                    ; 7t
@@ -11,7 +11,7 @@ mCODE	COMPO+7, 'doCONST', DoCONST
 
 ;   doLIST	( -- ) ( R: -- nest-sys )
 ;	Process colon list.
-mCODE	COMPO+6, 'doLIST', DoLIST
+hCODE	COMPO+6, 'doLIST', DoLIST
     DEC IX	                        ;10t
     LD  (IX+0),D	                ;19t
     DEC IX	                        ;10t
@@ -21,7 +21,7 @@ mCODE	COMPO+6, 'doLIST', DoLIST
 
 ;   doLIT	( -- x )
 ;	Push an inline literal.
-mCODE	COMPO+5, 'doLIT', DoLIT
+hCODE	COMPO+5, 'doLIT', DoLIT
     PUSH BC	                        ; 11t
     EX	DE,HL	                    ; 4t
     LD	C,(HL)	                    ; 7t
@@ -32,18 +32,18 @@ mCODE	COMPO+5, 'doLIT', DoLIT
 
 ;   doVAR       ( -- a )
 ;   Run time routine for VARIABLE and CREATE.
-mCOLON  COMPO+5, 'doVAR', DoVAR
+hCOLON  COMPO+5, 'doVAR', DoVAR
     DW  RFROM,EXIT
 
 ;   UP          ( -- a )
 ;   Pointer to the user area.
-mCOLON  2, 'UP', UP
+hCOLON  2, 'UP', UP
     DW  DoVAR
     DW  UPP
 
 ;   doUSER      ( -- a )
 ;   Run time routine for user variables.
-mCOLON  COMPO+6,'doUSER',DOUSE
+hCOLON  COMPO+6,'doUSER',DOUSE
     DW RFROM, AT, UP, AT, PLUS, EXIT
 
 ;   EXIT	( -- ) ( R: nest-sys -- )	\ CORE
@@ -60,14 +60,14 @@ mCODE	COMPO+4, 'EXIT', EXIT
 ;
 ;   : doDO	>R max-negative + R> OVER - SWAP R> SWAP >R SWAP >R >R ;
 
-mCOLON	COMPO+4,'doDO',DoDO
+hCOLON	COMPO+4,'doDO',DoDO
 	DW	ToR,DoLIT,MaxNegative,Plus,RFrom
 	DW	OVER,SUBB,SWAP,RFrom,SWAP,ToR,SWAP,ToR,ToR,EXIT
 
 ;   doLOOP	( -- ) ( R: loop-sys1 -- | loop-sys2 )
 ;		Run time routine for LOOP.
 
-mCODE	COMPO+6,'doLOOP',DoLOOP
+hCODE	COMPO+6,'doLOOP',DoLOOP
 	PUSH IX	        ; 15t
 	POP	HL	        ; 10t
 	INC	(HL)	    ; 11t
@@ -93,7 +93,7 @@ DOLOOP2:
 ;   do+LOOP	( n -- ) ( R: loop-sys1 -- | loop-sys2 )
 ;		Run time routine for +LOOP.
 
-mCODE	COMPO+7,'do+LOOP',DoPLOOP
+hCODE	COMPO+7,'do+LOOP',DoPLOOP
 	POP	HL	        ;10t this will be the new TOS
 	PUSH	BC	    ;11t
 	LD	B,H	        ; 4t

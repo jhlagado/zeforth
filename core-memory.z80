@@ -127,7 +127,7 @@ mCOLON  3,'TIB',TIB
 ;   @EXECUTE    ( a -- )
 ;               Execute vector stored in address a.
 
-mCOLON  8,'@EXECUTE',ATEXE
+hCOLON  8,'@EXECUTE',ATEXE
     DW      AT,QDUP                 ;?address or zero
     DW      QBRAN,EXE1
     DW      EXECU                   ;execute if non-zero

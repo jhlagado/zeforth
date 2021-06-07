@@ -25,13 +25,6 @@ aaLABEL:                                              ;;assembly label
     CALL doLIST
 .endm
 
-.macro mCONST, aaLEX, aaNAME, aaLABEL, aaVALUE
-	mCODE aaLEX, aaNAME, aaLABEL
-	nop
-	call DoCONST             
-	DW	aaVALUE
-.endm
-
 .macro mUSER, aaLEX, aaNAME, aaLABEL
 	mCODE aaLEX, aaNAME, aaLABEL
     nop                                     
@@ -48,16 +41,36 @@ aaLABEL:                                              ;;assembly label
 ORG vvLEN                           ;;point to count byte
     DB vvCODE - vvLEN - 1           ;;set count
 ORG vvCODE                          ;;restore code pointer
-    .align 2
+    ; .align 2
+.endm
+
+.macro hCODE, aaLEX, aaNAME, aaLABEL
+    .align 2                                         ;;force to cell boundary
+aaLABEL:                                              ;;assembly label
+.endm
+
+.macro hCOLON, aaLEX, aaNAME, aaLABEL
+    hCODE aaLEX, aaNAME, aaLABEL
+    nop                                     
+    CALL doLIST
+.endm
+
+.macro hUSER, aaLEX, aaNAME, aaLABEL
+	hCODE aaLEX, aaNAME, aaLABEL
+    nop                                     
+    CALL doLIST
+    DW DoUSE,vvUSER               
+    vvUSER .set vvUSER + CELLL
 .endm
 
 .macro mNEXTHL
-	LD	E,(HL)	                    ; 7t
-	INC	HL	                        ; 6t
-	LD	D,(HL)	                    ; 7t
-	INC	HL	                        ; 6t
-	EX	DE,HL	                    ; 4t
-	JP	(HL)	                    ; 4t
+    JP (IY)
+; 	LD	E,(HL)	                    ; 7t
+; 	INC	HL	                        ; 6t
+; 	LD	D,(HL)	                    ; 7t
+; 	INC	HL	                        ; 6t
+; 	EX	DE,HL	                    ; 4t
+; 	JP	(HL)	                    ; 4t
 .endm   	                        ; 34t
 
 .macro mNEXT

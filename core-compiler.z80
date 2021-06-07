@@ -1,16 +1,16 @@
-; ;   '           ( -- ca )
-; ;               Search context vocabularies for the next word in input stream.
-; mCOLON  1,"'",TICK
-;     DW      TOKEN,NAMEQ             ;?defined
-;     DW      QBRAN,TICK1
-;     DW      EXIT                    ;yes, push code address
-; TICK1:          
-;     DW      THROW                   ;no, error
+;   '           ( -- ca )
+;               Search context vocabularies for the next word in input stream.
+mCOLON  1,"'",TICK
+    DW      TOKEN,NAMEQ             ;?defined
+    DW      QBRAN,TICK1
+    DW      EXIT                    ;yes, push code address
+TICK1:          
+    DW      THROW                   ;no, error
 
-; ;   ALLOT       ( n -- )
-; ;               Allocate n bytes to the code dictionary.
-; mCOLON  5,'ALLOT',ALLOT
-;     DW      CP,PSTOR,EXIT           ;adjust code pointer
+;   ALLOT       ( n -- )
+;               Allocate n bytes to the code dictionary.
+mCOLON  5,'ALLOT',ALLOT
+    DW      CP,PSTOR,EXIT           ;adjust code pointer
 
 ;   ,           ( w -- )
 ;               Compile an integer into the code dictionary.
@@ -19,10 +19,10 @@ mCOLON  1,',',COMMA
     DW      CP,STORE,STORE,EXIT     ;adjust code pointer, compile
 
 
-; ;   [COMPILE]   ( -- ; <string> )
-; ;               Compile the next immediate word into code dictionary.
-; mCOLON  IMEDD+9,'[COMPILE]',BCOMP
-;     DW      TICK,COMMA,EXIT
+;   [COMPILE]   ( -- ; <string> )
+;               Compile the next immediate word into code dictionary.
+mCOLON  IMEDD+9,'[COMPILE]',BCOMP
+    DW      TICK,COMMA,EXIT
 
 
 ;   COMPILE     ( -- )
@@ -37,12 +37,12 @@ mCOLON  COMPO+7,'COMPILE',COMPI
 mCOLON  IMEDD+7,'LITERAL',LITER
     DW      COMPI,DOLIT,COMMA,EXIT
     
-; ;   $,"         ( -- )
-; ;               Compile a literal string up to next " .
-; mCOLON  3,'$,|',STRCQ
-;     DW      DOLIT,$22,WORDD         ;move string to code dictionary
-;     DW      COUNT,PLUS,ALGND        ;calculate aligned end of string
-;     DW      CP,STORE,EXIT           ;adjust the code pointer
+;   $,"         ( -- )
+;               Compile a literal string up to next " .
+hCOLON  3,'$,|',STRCQ
+    DW      DOLIT,$22,WORDD         ;move string to code dictionary
+    DW      COUNT,PLUS,ALGND        ;calculate aligned end of string
+    DW      CP,STORE,EXIT           ;adjust the code pointer
 
 ;   RECURSE     ( -- )
 ;               Make the current word available for compilation.
@@ -77,12 +77,10 @@ PNAM1:
     mDSTR   STRQP,' name'           ;null input
     DW      THROW
 
-;; FORTH compiler
-
 ;   $COMPILE    ( a -- )
 ;               Compile next word to code dictionary as a token or literal.
 
-mCOLON  8,'$COMPILE',SCOMP
+hCOLON  8,'$COMPILE',SCOMP
     DW      NAMEQ,QDUP              ;?defined
     DW      QBRAN,SCOM2
     DW      AT,DOLIT,IMEDD,ANDD     ;?immediate
@@ -99,7 +97,7 @@ SCOM3:          DW      THROW                   ;error
 ;   OVERT       ( -- )
 ;               Link a new word into the current vocabulary.
 
-mCOLON  5,'OVERT',OVERT
+hCOLON  5,'OVERT',OVERT
     DW      LAST,AT,CRRNT,AT,STORE,EXIT
 
 ;   ;           ( -- )
@@ -117,7 +115,7 @@ mCOLON  1,']',RBRAC
 ;   call,       ( ca -- )
 ;               Assemble a call instruction to ca.
 
-mCOLON  5,'call,',CALLC
+hCOLON  5,'call,',CALLC
     DW      DOLIT,CALLL,COMMA       ;Direct Threaded Code
     DW      COMMA,EXIT      ;DTC 8086 relative call
 
@@ -134,8 +132,6 @@ mCOLON  1,':',COLON
 mCOLON  9,'IMMEDIATE',IMMED
     DW      DOLIT,IMEDD,LAST,AT,AT,ORR
     DW      LAST,AT,STORE,EXIT
-
-;; Defining words
 
 ;   USER        ( u -- ; <string> )
 ;               Compile a new user variable.

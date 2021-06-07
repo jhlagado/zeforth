@@ -21,9 +21,8 @@ INIT:
             LD      BC,US                   
             LDIR                            
 
-            LD      HL,RPP                  ; set up Forth return stack
-            PUSH    HL 
-            POP     IX 
+            LD      IX, RPP                 ; set up Forth return stack
+            LD      IY, NEXT_STEP
 
             LD      BC, -1                  ; empty stack marker
             LD      DE, RESET + 1           ; contains reset vector

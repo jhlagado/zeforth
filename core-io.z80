@@ -65,7 +65,7 @@ NUFQ1:
 
 ;   PACE        ( -- )
 ;               Send a pace character for the file downloading process.
-mCOLON  4,'PACE',PACE
+hCOLON  4,'PACE',PACE
     DW      DOLIT,11,EMIT,EXIT
 
 ;   SPACE       ( -- )
@@ -110,12 +110,12 @@ mCOLON  COMPO+3,'do$',DOSTR
 
 ;   $"|         ( -- a )
 ;               Run time routine compiled by $". Return address of a compiled string.
-mCOLON  COMPO+3,'$||',STRQP
+hCOLON  COMPO+3,'$||',STRQP
     DW      DOSTR,EXIT              ;force a call to do$
 
 ;   ."|         ( -- )
 ;               Run time routine of ." . Output a compiled string.
-mCOLON  COMPO+3,'.||',DOTQP
+hCOLON  COMPO+3,'.||',DOTQP
     DW      DOSTR,COUNT,TYPEE,EXIT
 
 ;   .R          ( n +n -- )
@@ -146,10 +146,10 @@ mCOLON  1,'.',DOT
 DOT1:           
     DW      STR,SPACE,TYPEE,EXIT    ;yes, display signed
 
-; ;   .(          ( -- )
-; ;               Output following string up to next ) .
-; mCOLON  IMEDD+2,'.(',DOTPR
-;     DW      DOLIT,')',PARSE,TYPEE,EXIT
+;   .(          ( -- )
+;               Output following string up to next ) .
+mCOLON  IMEDD+2,'.(',DOTPR
+    DW      DOLIT,')',PARSE,TYPEE,EXIT
 
 ;   ?           ( a -- )
 ;               Display the contents in a memory cell.
@@ -158,7 +158,6 @@ mCOLON  1,'?',QUEST
 
 ;   ^H          ( bot eot cur -- bot eot cur )
 ;               Backup the cursor by one character.
-
 mCOLON  2,'^H',BKSP
     DW      TOR,OVER,RFROM,SWAP,OVER,XORR
     DW      QBRAN,BACK1
@@ -170,14 +169,12 @@ BACK1:
 
 ;   TAP         ( bot eot cur c -- bot eot cur )
 ;               Accept and echo the key stroke and bump the cursor.
-
 mCOLON  3,'TAP',TAP
     DW      DUPP,TECHO,ATEXE
     DW      OVER,CSTOR,DOLIT,1,PLUS,EXIT
 
 ;   kTAP        ( bot eot cur c -- bot eot cur )
 ;               Process a key stroke, CR or backspace.
-
 mCOLON  4,'kTAP',KTAP
     DW      DUPP,DOLIT,CRR,XORR
     DW      QBRAN,KTAP2
@@ -191,7 +188,6 @@ KTAP2:
 
 ;   accept      ( b u -- b u )
 ;               Accept characters to input buffer. Return with actual count.
-
 mCOLON  6,'accept',ACCEP
     DW      OVER,PLUS,OVER
 ACCP1:          
@@ -211,13 +207,11 @@ ACCP4:
 
 ;   EXPECT      ( b u -- )
 ;               Accept input stream and store count in SPAN.
-
-mCOLON  6,'EXPECT',EXPEC
+hCOLON  6,'EXPECT',EXPEC
     DW      TEXPE,ATEXE,SPAN,STORE,DROP,EXIT
 
 ;   QUERY       ( -- )
 ;               Accept input stream to terminal input buffer.
-
-mCOLON  5,'QUERY',QUERY
+hCOLON  5,'QUERY',QUERY
     DW      TIB,DOLIT,80,TEXPE,ATEXE,NTIB,STORE
     DW      DROP,DOLIT,0,INN,STORE,EXIT

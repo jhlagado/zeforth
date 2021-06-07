@@ -68,7 +68,7 @@ mCOLON  3, 'NOT', INVER
 
 ;   NEGAT      ( n -- -n )
 ;               Two's complement of tos.
-mCOLON	6,'NEGAT',NEGAT
+mCOLON	6,'NEGATE',NEGAT
     DW	INVER, OnePlus, EXIT
 
 ;   1+		( n1|u1 -- n2|u2 )		
