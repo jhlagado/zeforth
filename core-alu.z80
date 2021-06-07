@@ -1,9 +1,3 @@
-;   2*		( x1 -- x2 )			
-;		Bit-shift left, filling the least significant bit with 0.
-mCODE	2,'2*',TwoStar
-	SLA C
-	RL	B
-	mNEXT
 
 ;   0<          ( n -- t )
 ;               Return true if n is negative.
@@ -55,12 +49,6 @@ mCODE	3, 'XOR', XORR
 mCOLON	1,'+', PLUS
     DW	UMPlus, DROP, EXIT
 
-;   D+          ( d d -- d )
-;               Double addition, as an example using UM+.
-mCOLON	2,'D+',DPlus
-	DW	ToR,SWAP,ToR,UMPlus
-	DW	RFrom,RFrom,Plus,Plus,EXIT
-
 ;   NOT         ( w -- w )
 ;               One's complement of tos.
 mCOLON  3, 'NOT', INVER
@@ -78,7 +66,7 @@ mCOLON	2,'1+',OnePlus
 
 ;   DNEGATE     ( d -- -d )
 ;               Two's complement of top double.
-mCOLON	7,'DNEGATE',DNEGATE
+mCOLON	7,'DNEGATE',DNEGA
 	DW	INVER, ToR, INVER
 	DW	DoLIT, 1, UMPlus
 	DW	RFrom, Plus, EXIT
@@ -104,7 +92,7 @@ mCOLON	1, '=', EQUAL
 ;   0=		( x -- flag )			\ CORE
 ;		Return true if x is zero.
 
-mCODE	2,'0=',ZeroEquals,_FLINK
+mCODE	2,'0=',ZeroEquals
 	LD	A,B
 	OR	C	; result=0 if bc was 0
 	SUB	1	; cy set   if bc was 0 ;;; ???? TODO: replace with DEC A 
@@ -115,7 +103,7 @@ mCODE	2,'0=',ZeroEquals,_FLINK
 
 ;   U<          ( u u -- t )
 ;               Unsigned compare of top two items.
-mCOLON	2,'U<',ULess
+mCOLON	2,'U<',ULESS
 	DW	DDUP,XORR,ZLESS
 	DW	QBRAN,ULES1
 	DW	NIP,ZLESS,EXIT
@@ -179,13 +167,13 @@ UMP1:
 ; Unsigned divide of a double by a single. Return mod and quotient.
 ; Note: Less range than eForth because most significant word discarded TODO: fix 
 mCOLON  6,'UM/MOD',UMMOD
-    DW  NIP, UMSlashMOD2, EXIT
+    DW  NIP, UMSLMOD2, EXIT
 
 ; UM/MOD2	( ud u1 -- u2 u3 )		
 ; Unsigned division of a double-cell number ud by a single-cell
 ; number u1. Return remainder u2 and quotient u3.
 ; Note: Less range than eForth TODO: fix 
-mCODE	6,'UM/MOD2',UMSlashMOD2
+mCODE	6,'UM/MOD2',UMSLMOD2
     LD	A,B
 	OR	C
 	JR	Z,UMMOD2	;?zero divisor
@@ -263,78 +251,61 @@ UMMOD15:
 ;		Signed floored divide of double by single. Return mod n2
 ;		and quotient n3.
 ; TODO: this is usually called M/MOD in eForth
-mCOLON	6,'FM/MOD',FMSlashMOD
-	DW	DUPP,ToR,DDUP,XORR,ToR,ToR,DUPP,ZLESS
-	DW	QBRAN,FMMOD1
-	DW	DNEGATE
-FMMOD1:
-    DW	rat,ABSS,UMSlashMOD2
-	DW	RFrom,ZLESS,QBRAN,FMMOD2
-	DW	SWAP,NEGAT,SWAP
-FMMOD2:
-    DW	RFrom,ZLESS,QBRAN,FMMOD3
-	DW	NEGAT,OVER,QBRAN,FMMOD4
-	DW	rat,ROT,SUBB,SWAP,OneSUBB
-FMMOD4:
-    DW	RFrom,DROP
-	DW	DoLIT,0,OVER,LESS,QBRAN,FMMOD6
-	DW	DoLIT,ERR_OUTOFRANGE,THROWX
-FMMOD6:
-    DW	EXIT
-FMMOD3:
-    DW	RFrom,DROP,DUPP,ZLESS,QBRAN,FMMOD6
-	DW	DoLIT,ERR_OUTOFRANGE,THROWX
-
-;   1-		( n1|u1 -- n2|u2 )		\ COR
-;		Decrease top of the stack item by 1.
-mCOLON	2,'1-',OneSUBB,_FLINK
-	DW	DoLIT,-1,Plus,EXIT
-
-;   S>D 	( n -- d )			\ CORE
-;		Convert a single-cell number n to double-cell number.
-mCOLON	3,'S>D',SToD,_FLINK
-	DW	DUPP,ZLESS,EXIT
+mCOLON	6,'M/MOD',MSMOD
+    DW      DUPP,ZLESS,DUPP,TOR
+    DW      QBRAN,MMOD1
+    DW      NEGAT,TOR,DNEGA,RFROM
+MMOD1:          
+    DW      TOR,DUPP,ZLESS
+    DW      QBRAN,MMOD2
+    DW      RAT,PLUS
+MMOD2:          
+    DW      RFROM,UMMOD,RFROM
+    DW      QBRAN,MMOD3
+    DW      SWAP,NEGAT,SWAP
+MMOD3:          
+    DW      EXIT
 
 ;   /MOD        ( n n -- r q )
 ;               Signed divide. Return mod and quotient.
-mCOLON	4,'/MOD',SlashMOD
-    DW	ToR,SToD,RFrom,FMSlashMOD,EXIT
+mCOLON	4,'/MOD',SLMOD
+    DW  OVER,ZLESS,SWAP,MSMOD,EXIT
 
 ;   MOD         ( n n -- r )
 ;               Signed divide. Return mod only.
 mCOLON	3,'MOD',MODD
-	DW	SlashMOD,DROP,EXIT
+	DW	SLMOD,DROP,EXIT
 	
 ;   /           ( n n -- q )
 ;               Signed divide. Return quotient only.
-mCOLON	1,'/',Slash
-    DW	SlashMOD,NIP,EXIT
+mCOLON	1,'/',SLASH
+    DW	SLMOD,NIP,EXIT
 
 ;; Multiply
 
 ;   UM*         ( u u -- ud )
 ;               Unsigned multiply. Return double product.
-mCODE	3,'UM*',UMStar,_FLINK
+mCODE	3,'UM*',UMSTA
 	EX	DE,HL
 	EX	(SP),HL
 	EX	DE,HL
 	LD	HL,0
 	LD	A,010h
-UMSTAR1: 	
+UMSTA1: 	
     ADD	HL,HL
 	EX	DE,HL
 	ADC	HL,HL
 	EX	DE,HL
-	JR	NC,UMSTAR3
-UMSTAR2: 	
+	JR	NC,UMSTA3
+UMSTA2: 	
     ADD	HL,BC
-	JR	NC,UMSTAR3
-UMSTAR5: 	
+	JR	NC,UMSTA3
+UMSTA5: 	
     INC	DE
-UMSTAR3: 	
+UMSTA3: 	
     DEC	A
-	JR	NZ,UMSTAR1
-UMSTAR4: 	
+	JR	NZ,UMSTA1
+UMSTA4: 	
     LD	B,D
 	LD	C,E
 	EX	(SP),HL
@@ -342,27 +313,27 @@ UMSTAR4:
 
 ;   *           ( n n -- n )
 ;               Signed multiply. Return single product.
-mCOLON	1,'*',Star
-	DW	UMStar, DROP, EXIT
+mCOLON	1,'*',STAR
+	DW	UMSTA, DROP, EXIT
 
 ;   M*          ( n n -- d )
 ;               Signed multiply. Return double product.
-mCOLON	2,'M*',MStar,
+mCOLON	2,'M*',MSTAR,
 	DW	DDUP,XORR,ZLESS,ToR,ABSS,SWAP,ABSS
-	DW	UMStar,RFrom,QBRAN,MSTAR1
-	DW	DNEGATE
+	DW	UMSTA,RFrom,QBRAN,MSTAR1
+	DW	DNEGA
 MSTAR1:		
     DW	EXIT
 
 ;   */MOD       ( n1 n2 n3 -- r q )
 ;               Multiply n1 and n2, then divide by n3. Return mod and quotient.
-mCOLON	5,'*/MOD',StarSlashMOD
-	DW	ToR,MStar,RFrom,FMSlashMOD,EXIT
+mCOLON	5,'*/MOD',SSMOD
+	DW	ToR,MStar,RFrom,MSMOD,EXIT
 
 ;   */          ( n1 n2 n3 -- q )
 ;               Multiply n1 by n2, then divide by n3. Return quotient only.
-mCOLON	2,'*/',StarSlash
-	DW	StarSlashMOD,NIP,EXIT
+mCOLON	2,'*/',STASL
+	DW	SSMOD,NIP,EXIT
 
 ;   CELL+       ( a -- a )
 ;               Add cell size in byte to address.
@@ -377,10 +348,5 @@ mCOLON	5,'CELL-',CELLM
 ;   CELLS       ( n -- n )
 ;               Multiply tos by cell size in bytes.
 mCOLON	5,'CELLS',CELLS
-	DW	TwoStar,EXIT
+    DW  DOLIT,CELLL,STAR,EXIT
 
-;   CHAR+	( c-addr1 -- c-addr2 )		\ CORE
-;		Returns next character-aligned address.
-;
-mCOLON	5,'CHAR+',CHARPlus
-    DW	DoLIT,CHARR,Plus,EXIT

@@ -177,14 +177,14 @@ NAMQ2:          DW      RFROM,CELLP,DUPP,TOR    ;next in search order
 NAMQ3:          DW      RFROM,DROP              ;name not found
     DW      DOLIT,0,EXIT            ;false flag
 
-; ;   CATCH       ( ca -- 0 | err# )
-; ;               Execute word at ca and set up an error frame for it.
+;   CATCH       ( ca -- 0 | err# )
+;               Execute word at ca and set up an error frame for it.
 
-; mCOLON  5,'CATCH',CATCH
-;     DW      SPAT,TOR,HANDL,AT,TOR   ;save error frame
-;     DW      RPAT,HANDL,STORE,EXECU  ;execute
-;     DW      RFROM,HANDL,STORE       ;restore error frame
-;     DW      RFROM,DROP,DOLIT,0,EXIT ;no error
+mCOLON  5,'CATCH',CATCH
+    DW      SPAT,TOR,HANDL,AT,TOR   ;save error frame
+    DW      RPAT,HANDL,STORE,EXECU  ;execute
+    DW      RFROM,HANDL,STORE       ;restore error frame
+    DW      RFROM,DROP,DOLIT,0,EXIT ;no error
 
 ;   THROW       ( err# -- err# )
 ;               Reset system to current local error frame an update error flag.

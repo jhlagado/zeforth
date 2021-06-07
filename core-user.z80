@@ -51,7 +51,7 @@ mUSER   COMPO+3,'tmp',TEMP
 ;   SPAN        ( -- a )
 ;               Hold character count received by EXPECT.
 
-mUSER   4,'SPAN',SPAN
+hUSER   4,'SPAN',SPAN
 
 ;   >IN         ( -- a )
 ;               Hold the character pointer while parsing input stream.
