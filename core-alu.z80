@@ -87,19 +87,11 @@ ABS1:
 ;   =           ( w w -- t )
 ;               Return true if top two are equal.
 mCOLON	1, '=', EQUAL
-	DW	XORR, ZeroEquals, EXIT
-
-;   0=		( x -- flag )			\ CORE
-;		Return true if x is zero.
-
-mCODE	2,'0=',ZeroEquals
-	LD	A,B
-	OR	C	; result=0 if bc was 0
-	SUB	1	; cy set   if bc was 0 ;;; ???? TODO: replace with DEC A 
-	SBC	A,A	; propagate cy through A
-	LD	B,A	; put 0000 or FFFF in TOS
-	LD	C,A
-	mNEXT
+    DW      XORR
+    DW      QBRAN,EQU1
+    DW      DOLIT,0,EXIT            ;false flag
+EQU1:           
+    DW      DOLIT,-1,EXIT           ;true flag
 
 ;   U<          ( u u -- t )
 ;               Unsigned compare of top two items.
@@ -349,4 +341,3 @@ mCOLON	5,'CELL-',CELLM
 ;               Multiply tos by cell size in bytes.
 mCOLON	5,'CELLS',CELLS
     DW  DOLIT,CELLL,STAR,EXIT
-
