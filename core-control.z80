@@ -65,19 +65,23 @@ mCOLON  IMEDD+5,'WHILE',WHILE
 
 ;   ABORT"      ( -- ; <string> )
 ;               Conditional abort with an error message.
-
+mCOLON  IMEDD+6,'ABORT|',ABRTQ
+    DW      COMPI,ABORQ,STRCQ,EXIT
 
 ;   $"          ( -- ; <string> )
 ;               Compile an inline string literal.
-
+mCOLON  IMEDD+2,'$|',STRQ
+    DW      COMPI,STRQP,STRCQ,EXIT
 
 ;   ."          ( -- ; <string> )
 ;               Compile an inline string literal to be typed out at run time.
+mCOLON  IMEDD+2,'.|',DOTQ
+    DW      COMPI,DOTQP,STRCQ,EXIT
 
-;   UNLOOP	( -- ) ( R: loop-sys -- )	\ CORE
-;		Discard loop-control parameters for the current nesting level.
-;		An UNLOOP is required for each nesting level before the
-;		definition may be EXITed.
-mCOLON	COMPO+6,'UNLOOP',UNLOOP
-	DW	RFrom,RFrom,RFrom,DDROP,ToR,EXIT
+; ;   UNLOOP	( -- ) ( R: loop-sys -- )	\ CORE
+; ;		Discard loop-control parameters for the current nesting level.
+; ;		An UNLOOP is required for each nesting level before the
+; ;		definition may be EXITed.
+; mCOLON	COMPO+6,'UNLOOP',UNLOOP
+; 	DW	RFrom,RFrom,RFrom,DDROP,ToR,EXIT
 

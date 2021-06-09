@@ -19,9 +19,9 @@ hCODE	COMPO+6, 'doLIST', DoLIST
     POP	HL	                        ;10t
     mNEXTHL							
 
-;   doLIT	( -- x )
+;   DOLIT	( -- x )
 ;	Push an inline literal.
-hCODE	COMPO+5, 'doLIT', DoLIT
+hCODE	COMPO+5, 'DOLIT', DOLIT
     PUSH BC	                        ; 11t
     EX	DE,HL	                    ; 4t
     LD	C,(HL)	                    ; 7t
@@ -61,66 +61,66 @@ mCODE	COMPO+4, 'EXIT', EXIT
 ;   : doDO	>R max-negative + R> OVER - SWAP R> SWAP >R SWAP >R >R ;
 
 hCOLON	COMPO+4,'doDO',DoDO
-	DW	ToR,DoLIT,MaxNegative,Plus,RFrom
+	DW	ToR,DOLIT,MaxNegative,Plus,RFrom
 	DW	OVER,SUBB,SWAP,RFrom,SWAP,ToR,SWAP,ToR,ToR,EXIT
 
-;   doLOOP	( -- ) ( R: loop-sys1 -- | loop-sys2 )
-;		Run time routine for LOOP.
+; ;   doLOOP	( -- ) ( R: loop-sys1 -- | loop-sys2 )
+; ;		Run time routine for LOOP.
 
-hCODE	COMPO+6,'doLOOP',DoLOOP
-	PUSH IX	        ; 15t
-	POP	HL	        ; 10t
-	INC	(HL)	    ; 11t
-	JR Z,DOLOOP2	; 12/7t a fast dec is ok, only
-DOLOOP1: 	
-    LD	A,(DE)	    ; 7t go back to the loop
-	LD	L,A	        ; 4t
-	INC	DE	        ; 6t
-	LD	A,(DE)	    ; 7t
-	LD	H,A	        ; 4t
-	mNEXTHL
-DOLOOP2: 	
-    INC	HL	        ; 6t
-	INC	(HL)	    ;11t
-	JP PO,DOLOOP1   ;10/7t ?loop end
-	EX	DE,HL	    ; 4t yes,continue past the BRAN offset
-	LD	DE,4	    ;10t clear return stack
-	ADD IX,DE	    ;15h
-	INC	HL	        ; 6t
-	INC	HL	        ; 6t
-	mNEXTHL
+; hCODE	COMPO+6,'doLOOP',DoLOOP
+; 	PUSH IX	        ; 15t
+; 	POP	HL	        ; 10t
+; 	INC	(HL)	    ; 11t
+; 	JR Z,DOLOOP2	; 12/7t a fast dec is ok, only
+; DOLOOP1: 	
+;     LD	A,(DE)	    ; 7t go back to the loop
+; 	LD	L,A	        ; 4t
+; 	INC	DE	        ; 6t
+; 	LD	A,(DE)	    ; 7t
+; 	LD	H,A	        ; 4t
+; 	mNEXTHL
+; DOLOOP2: 	
+;     INC	HL	        ; 6t
+; 	INC	(HL)	    ;11t
+; 	JP PO,DOLOOP1   ;10/7t ?loop end
+; 	EX	DE,HL	    ; 4t yes,continue past the BRAN offset
+; 	LD	DE,4	    ;10t clear return stack
+; 	ADD IX,DE	    ;15h
+; 	INC	HL	        ; 6t
+; 	INC	HL	        ; 6t
+; 	mNEXTHL
 
-;   do+LOOP	( n -- ) ( R: loop-sys1 -- | loop-sys2 )
-;		Run time routine for +LOOP.
+; ;   do+LOOP	( n -- ) ( R: loop-sys1 -- | loop-sys2 )
+; ;		Run time routine for +LOOP.
 
-hCODE	COMPO+7,'do+LOOP',DoPLOOP
-	POP	HL	        ;10t this will be the new TOS
-	PUSH	BC	    ;11t
-	LD	B,H	        ; 4t
-	LD	C,L	        ; 4t
-	EXX		        ; 4t
-	POP	BC	        ;10t old TOS = loop increment
-	LD L,(IX+0)     ;19t
-	LD H,(IX+1)     ;19t
-	OR	A	        ; 4t clear carry
-	ADC HL,BC	    ;15t
-	JP PE,DOPLP1	;10/7t ?loop end
-	LD (IX+0),L     ;19t   no, go back
-	LD (IX+1),H     ;19t
-	EXX		        ; 4t
-	LD	A,(DE)	    ; 7t go back to the loop
-	LD	L,A	        ; 4t
-	INC	DE	        ; 6t
-	LD	A,(DE)	    ; 7t
-	LD	H,A	        ; 4t
-	mNEXTHL
-DOPLP1:		
-    LD	BC,4	    ;10t clear return stack
-	ADD IX,BC	    ;15h
-	EXX		        ; 4t
-	INC	DE	        ; 6t yes,continue past the BRAN offset
-	INC	DE	        ; 6t
-	mNEXT
+; hCODE	COMPO+7,'do+LOOP',DoPLOOP
+; 	POP	HL	        ;10t this will be the new TOS
+; 	PUSH	BC	    ;11t
+; 	LD	B,H	        ; 4t
+; 	LD	C,L	        ; 4t
+; 	EXX		        ; 4t
+; 	POP	BC	        ;10t old TOS = loop increment
+; 	LD L,(IX+0)     ;19t
+; 	LD H,(IX+1)     ;19t
+; 	OR	A	        ; 4t clear carry
+; 	ADC HL,BC	    ;15t
+; 	JP PE,DOPLP1	;10/7t ?loop end
+; 	LD (IX+0),L     ;19t   no, go back
+; 	LD (IX+1),H     ;19t
+; 	EXX		        ; 4t
+; 	LD	A,(DE)	    ; 7t go back to the loop
+; 	LD	L,A	        ; 4t
+; 	INC	DE	        ; 6t
+; 	LD	A,(DE)	    ; 7t
+; 	LD	H,A	        ; 4t
+; 	mNEXTHL
+; DOPLP1:		
+;     LD	BC,4	    ;10t clear return stack
+; 	ADD IX,BC	    ;15h
+; 	EXX		        ; 4t
+; 	INC	DE	        ; 6t yes,continue past the BRAN offset
+; 	INC	DE	        ; 6t
+; 	mNEXT
 
 ;   next        ( -- )
 ;               Run time code for the single index loop.

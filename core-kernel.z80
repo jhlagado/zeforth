@@ -1,3 +1,29 @@
+hCOLON	4,'KOLD',KOLD
+    DW  STOIO
+    ; DW	DOLIT, 65, EMIT
+    DW  DOLIT, HELLO, COUNT, TYPEE
+    DW	QUIT
+HELLO: .pstr "Hello Forth! \r\n"
+
+SVEC:       
+    POP HL      ; get return address 
+    PUSH DE
+    LD A,L      ; sub 3
+    SUB 3
+    RR A        ; div by 8 / 2 for word offser
+    RR A
+    LD D,0
+    LD E,A
+SVEC1:
+    LD HL, VECTAB
+    ADD HL,DE
+    LD E,(HL)
+    INC HL
+    LD D,(HL)
+    EX DE,HL
+    POP DE
+    JP (HL)
+
 NEXT_STEP:
 	LD	E,(HL)	                    ; 7t
 	INC	HL	                        ; 6t
@@ -7,11 +33,21 @@ NEXT_STEP:
 	JP	(HL)	                    ; 4t
 
 mCOLON	4,'COLD',COLD
-    DW  STOIO
-    ; DW	DOLIT, 65, EMIT
-    DW  DOLIT, HELLO, COUNT, TYPEE
-    DW	QUIT
-HELLO: .pstr "Hello Forth! \r\n"
+COLD1:          
+    DW      DOLIT,UZERO,DOLIT,UPP
+    DW      DOLIT,ULAST-UZERO,CMOVE ;initialize user area
+    DW      PRESE                   ;initialize stack and TIB
+    ; DW      TBOOT,ATEXE             ;application boot
+    ; DW      FORTH,CNTXT,AT,DUPP     ;initialize search order
+    ; DW      CRRNT,DSTOR,OVERT
+    DW      QUIT                    ;start interpretation
+    DW      BRAN,COLD1              ;just in case
+
+;   PRESET      ( -- )
+;               Reset data stack pointer and the terminal input buffer.
+mCOLON  6,'PRESET',PRESE
+    DW      SZERO,AT,SPSTO
+    DW      DOLIT,TIBB,NTIB,CELLP,STORE,EXIT
 
 mCODE  4, 'QUIT', QUIT
     HALT
@@ -45,17 +81,8 @@ hCODE	COMPO+6,'branch', BRAN
 	LD	H,A	; 4t
 	mNEXTHL
 	
-;   TYPECSTR    ( cstr -- )
-;   Similar to TYPE but prints C null terminated strings
-mCODE	3,'TYPESZ',TypeCStr
-    ld H,B
-    ld L,C
-    call PRINTSZ
-    pop BC
-    mNEXT
-
 ;   THROW    ( cstr -- )
 ;   Prints string message and returns TODO: restart Forth interpreter QUIT
 mCOLON	5,'THROWX',THROWX
-	DW  TypeCStr, EXIT
+	DW  TYPESZ, EXIT
 

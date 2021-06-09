@@ -1,8 +1,23 @@
 ;   PC!         ( uc p --  )
 ;               output uc to IO port p
+mCODE   3,'PC!',PCSTO
+    EXX           ; 4t
+    POP DE        ;10t
+    LD  A, E      ; 4t
+    OUT (C), A    ;12t
+    EXX           ; 4t
+    mNEXT
 
 ;   PC@         ( p -- uc )
 ;               output uc to IO port p
+mCODE   3,'PC@',PCAT
+    EXX           ; 4t
+    IN  A, (C)    ;12t
+    LD  E, A      ; 4t
+    LD  D, 0      ; 7t
+    PUSH DE       ;11t
+    EXX           ; 4t
+    mNEXT
 
 ;   !IO         ( -- )
 ;               Initialize the serial I/O devices.
@@ -59,7 +74,7 @@ mCOLON  4, 'EMIT', EMIT
 mCOLON  4,'NUF?',NUFQ
     DW      QKEY,DUPP
     DW      QBRAN,NUFQ1
-    DW      DDROP,KEY,DoLIT,CRR,EQUAL
+    DW      DDROP,KEY,DOLIT,CRR,EQUAL
 NUFQ1:          
     DW      EXIT
 
@@ -96,10 +111,19 @@ TYPE2:
     DW      DONXT,TYPE1
     DW      DROP,EXIT
 
+;   TYPECSTR    ( cstr -- )
+;   Similar to TYPE but prints C null terminated strings
+mCODE	3,'TYPESZ',TYPESZ
+    ld H,B
+    ld L,C
+    call PRINTSZ
+    pop BC
+    mNEXT
+
 ;   CR          ( -- )
 ;               Output a carriage return and a line feed.
 mCOLON	2,'CR',CR
-    DW	DoLIT,CRR,EMIT,DoLIT,LFF,EMIT,EXIT
+    DW	DOLIT,CRR,EMIT,DOLIT,LFF,EMIT,EXIT
 
 ;   do$         ( -- a )
 ;               Return the address of a compiled string.
@@ -206,7 +230,7 @@ ACCP4:
     DW      DROP,OVER,SUBB,EXIT
 
 ;   EXPECT      ( b u -- )
-;               Accept input stream and store count in SPAN.
+;               Accept input stream and STORE count in SPAN.
 hCOLON  6,'EXPECT',EXPEC
     DW      TEXPE,ATEXE,SPAN,STORE,DROP,EXIT
 

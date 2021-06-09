@@ -1,4 +1,3 @@
-                ORG      INT_ADDR           ; RST 38 - INTERRUPT VECTOR [ for IM 1 ]
 serialInt:      PUSH     AF
                 PUSH     HL
 

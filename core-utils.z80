@@ -41,7 +41,7 @@ DUMP1:
 DUMP2:          
     DW      RFROM,DROP              ;cleanup loop stack, early exit
 DUMP3:          
-    DW      DROP,RFROM,BASE,STORE   ;restore radix
+    DW      DROP,RFROM,BASE,STORE   ;reSTORE radix
     DW      EXIT
 
 ;   .S          ( ... -- ... )
@@ -68,14 +68,58 @@ DOTS2:
 
 ;   >NAME       ( ca -- na | F )
 ;               Convert code address to a name address.
-
+    mCOLON  5,'>NAME',TNAME
+    DW      CRRNT                   ;vocabulary link
+TNAM1:          
+    DW      CELLP,AT,QDUP           ;check all vocabularies
+    DW      QBRAN,TNAM4
+    DW      DDUP
+TNAM2:          
+    DW      AT,DUPP                 ;?last word in a vocabulary
+    DW      QBRAN,TNAM3
+    DW      DDUP,NAMET,XORR         ;compare
+    DW      QBRAN,TNAM3
+    DW      CELLM                   ;continue with next word
+    DW      BRAN,TNAM2
+TNAM3:          
+    DW      SWAP,DROP,QDUP
+    DW      QBRAN,TNAM1
+    DW      SWAP,DROP,SWAP,DROP,EXIT
+TNAM4:      
+    DW      DROP,DOLIT,0,EXIT       ;false flag
 
 ;   .ID         ( na -- )
 ;               Display the name at address.
+mCOLON  3,'.ID',DOTID
+    DW      QDUP                    ;if zero no name
+    DW      QBRAN,DOTI1
+    DW      COUNT,DOLIT,MASKK,ANDD   ;mask lexicon bits
+    DW      UTYPE,EXIT              ;display name string
+DOTI1:          
+    mDSTR   DOTQP,' {noName}'
+    DW      EXIT
 
 
 ;   SEE         ( -- ; <string> )
 ;               A simple decompiler.
+mCOLON  3,'SEE',SEE
+    DW      TICK                    ;starting address
+    DW      CR,CELLP
+SEE1:           
+    DW      CELLP,DUPP,AT,DUPP      ;?does it contain a zero
+    DW      QBRAN,SEE2
+    DW      TNAME                   ;?is it a name
+SEE2:           
+    DW      QDUP                    ;name address or zero
+    DW      QBRAN,SEE3
+    DW      SPACE,DOTID             ;display name
+    DW      BRAN,SEE4
+SEE3:           
+    DW      DUPP,AT,UDOT            ;display number
+SEE4:           
+    DW      NUFQ                    ;user control
+    DW      QBRAN,SEE1
+    DW      DROP,EXIT
 
 
 ;   WORDS       ( -- )

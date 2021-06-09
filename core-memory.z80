@@ -1,6 +1,6 @@
 ;   !           ( w a -- )
 ;               Pop the data stack to memory.
-mCODE	1,'!',Store
+mCODE	1,'!',STORE
 	LD	H,B
 	LD	L,C
 	POP	BC
@@ -91,7 +91,7 @@ mCOLON  2,'+!',PSTOR
     DW      SWAP,STORE,EXIT
 
 ;   2!          ( d a -- )
-;               Store the double integer to address a.
+;               STORE the double integer to address a.
 mCOLON  2,'2!',DSTOR
     DW      SWAP,OVER,STORE
     DW      CELLP,STORE,EXIT
@@ -125,7 +125,7 @@ mCOLON  3,'TIB',TIB
     DW      NTIB,CELLP,AT,EXIT
 
 ;   @EXECUTE    ( a -- )
-;               Execute vector stored in address a.
+;               Execute vector STOREd in address a.
 
 hCOLON  8,'@EXECUTE',ATEXE
     DW      AT,QDUP                 ;?address or zero
@@ -193,6 +193,6 @@ mCOLON  7,'ALIGNED', ALGND
     DW      DUPP,DOLIT,0,DOLIT,CELLL
     DW      UMMOD,DROP,DUPP
     DW      QBRAN,ALGN1
-    DW      DoLIT,CELLL,SWAP,SUBB
+    DW      DOLIT,CELLL,SWAP,SUBB
 ALGN1:          
     DW      PLUS,EXIT

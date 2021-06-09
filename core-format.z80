@@ -45,13 +45,11 @@ mCOLON	4,'SIGN',SIGN
 SIGN1:		
     DW	EXIT
 
-
 ;   #>          ( w -- b u )
 ;               Prepare the output string to be TYPE'd.
 mCOLON  2,'#>',EDIGS
     DW      DROP,HLD,AT
     DW      PAD,OVER,SUBB,EXIT
-
 
 ;   str         ( n -- b u )
 ;               Convert a signed integer to a numeric string.
@@ -59,7 +57,6 @@ hCOLON  3,'str',STR
     DW      DUPP,TOR,ABSS
     DW      BDIGS,DIGS,RFROM
     DW      SIGN,EDIGS,EXIT
-
 
 ;   HEX         ( -- )
 ;               Use radix 16 as base for numeric conversions.

@@ -52,23 +52,18 @@ mCOLON	1,'+', PLUS
 ;   NOT         ( w -- w )
 ;               One's complement of tos.
 mCOLON  3, 'NOT', INVER
-    DW  DoLIT, -1, XORR, EXIT
+    DW  DOLIT, -1, XORR, EXIT
 
 ;   NEGAT      ( n -- -n )
 ;               Two's complement of tos.
 mCOLON	6,'NEGATE',NEGAT
-    DW	INVER, OnePlus, EXIT
-
-;   1+		( n1|u1 -- n2|u2 )		
-;		Increase top of the stack item by 1.
-mCOLON	2,'1+',OnePlus
-	DW	DoLIT, 1, Plus, EXIT
+    DW	INVER, DOLIT, 1, Plus, EXIT
 
 ;   DNEGATE     ( d -- -d )
 ;               Two's complement of top double.
 mCOLON	7,'DNEGATE',DNEGA
 	DW	INVER, ToR, INVER
-	DW	DoLIT, 1, UMPlus
+	DW	DOLIT, 1, UMPlus
 	DW	RFrom, Plus, EXIT
 
 ;   -           ( n1 n2 -- n1-n2 )
@@ -96,16 +91,11 @@ EQU1:
 ;   U<          ( u u -- t )
 ;               Unsigned compare of top two items.
 mCOLON	2,'U<',ULESS
-	DW	DDUP,XORR,ZLESS
-	DW	QBRAN,ULES1
-	DW	NIP,ZLESS,EXIT
-ULES1:		
-    DW	SUBB,ZLESS,EXIT
-
-;   NIP 	( n1 n2 -- n2 ) 		\ CORE EXT
-;		Discard the second stack item.
-mCOLON	3,'NIP',NIP
-	DW	SWAP,DROP,EXIT
+    DW      DDUP,XORR,ZLESS
+    DW      QBRAN,ULES1
+    DW      SWAP,DROP,ZLESS,EXIT
+ULES1:          
+    DW      SUBB,ZLESS,EXIT
 
 ;   <           ( n1 n2 -- t )
 ;               is less than
@@ -114,11 +104,6 @@ mCOLON	1,'<',LESS
 	DW	DROP, ZLESS, EXIT
 LESS1:		
     DW	SUBB, ZLESS, EXIT
-
-;   >           ( n1 n2 -- t )
-;               is greater than
-mCOLON	1,'>',GreaterThan
-	DW	SWAP,LESS,EXIT
 
 ;   MAX         ( n n -- n )
 ;               Return the greater of two top stack items.
@@ -131,10 +116,11 @@ MAX1:
 ;   MIN         ( n n -- n )
 ;               Return the smaller of top two stack items.
 mCOLON	3,'MIN',MIN
-	DW	DDUP,GreaterThan,QBRAN,MIN1
-	DW	SWAP
-MIN1:		
-    DW	DROP,EXIT
+    DW      DDUP,SWAP,LESS
+    DW      QBRAN,MIN1
+    DW      SWAP
+MIN1:           
+    DW      DROP,EXIT
 
 ;   WITHIN      ( u ul uh -- t )
 ;               Return true if u is within the range of ul and uh.
@@ -144,7 +130,7 @@ mCOLON	6,'WITHIN',WITHI
 
 ;   UM+         ( w w -- w cy )
 ;               Add two numbers, return the sum and carry flag.
-mCODE	3,'um+',UMPlus
+hCODE	3,'um+',UMPlus
     POP	HL	            ;10t
 	ADD	HL,BC	        ;11t
 	PUSH	HL	        ;11t
@@ -159,7 +145,7 @@ UMP1:
 ; Unsigned divide of a double by a single. Return mod and quotient.
 ; Note: Less range than eForth because most significant word discarded TODO: fix 
 mCOLON  6,'UM/MOD',UMMOD
-    DW  NIP, UMSLMOD2, EXIT
+    DW  SWAP,DROP, UMSLMOD2, EXIT
 
 ; UM/MOD2	( ud u1 -- u2 u3 )		
 ; Unsigned division of a double-cell number ud by a single-cell
@@ -271,7 +257,7 @@ mCOLON	3,'MOD',MODD
 ;   /           ( n n -- q )
 ;               Signed divide. Return quotient only.
 mCOLON	1,'/',SLASH
-    DW	SLMOD,NIP,EXIT
+    DW	SLMOD,SWAP,DROP,EXIT
 
 ;; Multiply
 
@@ -325,7 +311,7 @@ mCOLON	5,'*/MOD',SSMOD
 ;   */          ( n1 n2 n3 -- q )
 ;               Multiply n1 by n2, then divide by n3. Return quotient only.
 mCOLON	2,'*/',STASL
-	DW	SSMOD,NIP,EXIT
+	DW	SSMOD,SWAP,DROP,EXIT
 
 ;   CELL+       ( a -- a )
 ;               Add cell size in byte to address.
@@ -341,3 +327,4 @@ mCOLON	5,'CELL-',CELLM
 ;               Multiply tos by cell size in bytes.
 mCOLON	5,'CELLS',CELLS
     DW  DOLIT,CELLL,STAR,EXIT
+    

@@ -6,13 +6,31 @@ TESTMODE    EQU     0
             .INCLUDE "word.macro.z80" 
 
             .ORG    START_ROM 
-
-RESET:            
+RESET:      
             JP      INIT                    ; C3 veclo vechi
 
-            .INCLUDE "interrupt.z80" 
-
+            .ORG    $08 
+RST08:      CALL SVEC
+            .ORG    $10 
+RST10:      CALL SVEC
+            .ORG    $18 
+RST18:      CALL SVEC
+            .ORG    $20 
+RST20:      CALL SVEC
+            .ORG    $28 
+RST28:      CALL SVEC
+            .ORG    $30 
+RST30:      CALL SVEC
+            .ORG    $38 
+RST38:      CALL SVEC
+            .ORG    $66 
+RST66:      
+            PUSH DE
+            LD DE, 0 
+            JP SVEC1
 INIT:                
+            LD HL, serialInt
+            LD (vRST38),HL
             LD      HL,SPP                  ; Setup Forth data stack
             LD      SP,HL                   ; also used as return stack by interrupts etc
 
@@ -26,20 +44,21 @@ INIT:
 
             LD      BC, -1                  ; empty stack marker
             LD      DE, RESET + 1           ; contains reset vector
-            JP      COLD 
+            JP      KOLD 
 
             IF      TESTMODE 
             JP      TESTS_START 
 
             ELSE     
-            LD      HL,GREETING 
-            CALL    PRINTSZ 
+            ; LD      HL,GREETING 
+            ; CALL    PRINTSZ 
 LOOP:                
             CALL    RXA 
             CALL    TXA 
             JP      LOOP 
             ENDIF    
 
+            .INCLUDE "interrupt.z80" 
             .INCLUDE "serial.z80" 
             .INCLUDE "defaults.z80" 
 

@@ -183,15 +183,15 @@ NAMQ3:          DW      RFROM,DROP              ;name not found
 mCOLON  5,'CATCH',CATCH
     DW      SPAT,TOR,HANDL,AT,TOR   ;save error frame
     DW      RPAT,HANDL,STORE,EXECU  ;execute
-    DW      RFROM,HANDL,STORE       ;restore error frame
+    DW      RFROM,HANDL,STORE       ;reSTORE error frame
     DW      RFROM,DROP,DOLIT,0,EXIT ;no error
 
 ;   THROW       ( err# -- err# )
 ;               Reset system to current local error frame an update error flag.
 mCOLON  5,'THROW',THROW
-    DW      HANDL,AT,RPSTO          ;restore return stack
-    DW      RFROM,HANDL,STORE       ;restore handler frame
-    DW      RFROM,SWAP,TOR,SPSTO    ;restore data stack
+    DW      HANDL,AT,RPSTO          ;reSTORE return stack
+    DW      RFROM,HANDL,STORE       ;reSTORE handler frame
+    DW      RFROM,SWAP,TOR,SPSTO    ;reSTORE data stack
     DW      DROP,RFROM,EXIT
 
 ;   NULL$       ( -- a )

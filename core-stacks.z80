@@ -87,5 +87,5 @@ mCOLON  4,'PICK',PICK
 ;               Return the depth of the data stack.
 mCOLON	5,'DEPTH',DEPTH
 	DW	SPAT,SZero,AT,SWAP,SUBB
-	DW	DoLIT,CELLL,Slash,EXIT
+	DW	DOLIT,CELLL,Slash,EXIT
 
