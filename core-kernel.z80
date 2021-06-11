@@ -5,25 +5,6 @@ hCOLON	4,'KOLD',KOLD
     DW	QUIT
 HELLO: .pstr "Hello Forth! \r\n"
 
-SVEC:       
-    POP HL      ; get return address 
-    PUSH DE
-    LD A,L      ; sub 3
-    SUB 3
-    RR A        ; div by 8 / 2 for word offser
-    RR A
-    LD D,0
-    LD E,A
-SVEC1:
-    LD HL, VECTAB
-    ADD HL,DE
-    LD E,(HL)
-    INC HL
-    LD D,(HL)
-    EX DE,HL
-    POP DE
-    JP (HL)
-
 NEXT_STEP:
 	LD	E,(HL)	                    ; 7t
 	INC	HL	                        ; 6t

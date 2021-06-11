@@ -6,48 +6,58 @@ TESTMODE    EQU     0
             .INCLUDE "word.macro.z80" 
 
             .ORG    START_ROM 
-RESET:      
-            JP      INIT                    ; C3 veclo vechi
+RESET:      JP      INIT                    
 
             .ORG    $08 
-RST08:      CALL SVEC
+RST08:      LD HL,(vRST08)
+            JP (HL)
+            
             .ORG    $10 
-RST10:      CALL SVEC
+RST10:      LD HL,(vRST10)
+            JP (HL)
+            
             .ORG    $18 
-RST18:      CALL SVEC
+RST18:      LD HL,(vRST18)
+            JP (HL)
+            
             .ORG    $20 
-RST20:      CALL SVEC
+RST20:      LD HL,(vRST20)
+            JP (HL)
+            
             .ORG    $28 
-RST28:      CALL SVEC
+RST28:      LD HL,(vRST28)
+            JP (HL)
+            
             .ORG    $30 
-RST30:      CALL SVEC
+RST30:      LD HL,(vRST30)
+            JP (HL)
+            
             .ORG    $38 
-RST38:      CALL SVEC
+RST38:      LD HL,(vINT)
+            JP (HL)
+
             .ORG    $66 
-RST66:      
-            PUSH DE
-            LD DE, 0 
-            JP SVEC1
+RST66:      LD HL,(vNMI)
+            JP (HL)
 INIT:                
             LD HL, serialInt
-            LD (vRST38),HL
-            LD      HL,SPP                  ; Setup Forth data stack
-            LD      SP,HL                   ; also used as return stack by interrupts etc
+            LD (vINT),HL
+            LD HL,SPP                  ; Setup Forth data stack
+            LD SP,HL                   ; also used as return stack by interrupts etc
 
-            LD      HL,DEFAULTS             ; initialize user variables with defaults
-            LD      DE,UPP                  
-            LD      BC,US                   
+            LD HL,DEFAULTS             ; initialize user variables with defaults
+            LD DE,UPP                  
+            LD BC,US                   
             LDIR                            
 
-            LD      IX, RPP                 ; set up Forth return stack
-            LD      IY, NEXT_STEP
+            LD IX, RPP                 ; set up Forth return stack
+            LD IY, NEXT_STEP
 
-            LD      BC, -1                  ; empty stack marker
-            LD      DE, RESET + 1           ; contains reset vector
-            JP      KOLD 
+            LD BC, -1                  ; empty stack marker
+            JP KOLD 
 
-            IF      TESTMODE 
-            JP      TESTS_START 
+            IF TESTMODE 
+            JP TESTS_START 
 
             ELSE     
             ; LD      HL,GREETING 

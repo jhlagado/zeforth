@@ -41,14 +41,14 @@ serBufUsed:     DW 0
 serBuf:         DS SER_BUFSIZE
 
 VECTAB:
-vNMI            DW 0
 vRST08:         DW 0
 vRST10:         DW 0
 vRST18:         DW 0
 vRST20:         DW 0
 vRST28:         DW 0
 vRST30:         DW 0
-vRST38:         DW 0
+vINT:           DW 0
+vNMI            DW 0
 
 CPP:                              ; grows up
                 .ORG END_RAM - 2
