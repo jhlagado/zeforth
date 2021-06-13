@@ -7,16 +7,16 @@ vvLINK .set 0                                     ;force a null link
 vvUSER .set 0                             ;first user variable offset
 
 .macro mCODE, aaLEX, aaNAME, aaLABEL
-    .align 2                                         ;;force to cell boundary
-aaLABEL:                                              ;;assembly label
+    .align 2                                         ; force to cell boundary
+aaLABEL:                                              ; assembly label
     vvCODE .set $
-    vvLEN  .set (aaLEX & 01FH) / CELLL              ;;string cell count, round down
+    vvLEN  .set (aaLEX & 01FH) / CELLL              ; string cell count, round down
     ORG vvNAME - ((vvLEN + 3) * CELLL)                                     ; ? needed
     vvNAME .set $
-    DW vvCODE, vvLINK                               ;;token pointer and link
-    vvLINK .set $                                   ;;link points to a name string
-    DB aaLEX, aaNAME                                    ;;name string
-    ORG vvCODE                                      ;;restore code pointer
+    DW vvCODE, vvLINK                               ; token pointer and link
+    vvLINK .set $                                   ; link points to a name string
+    DB aaLEX, aaNAME                                    ; name string
+    ORG vvCODE                                      ; restore code pointer
 .endm
 
 .macro mCOLON, aaLEX, aaNAME, aaLABEL
@@ -34,19 +34,19 @@ aaLABEL:                                              ;;assembly label
 .endm
 
 .macro mDSTR, aaFUNC, aaSTR
-    DW aaFUNC                       ;;function
-    vvLEN .set $                    ;;save address of count byte
-    DB 0,aaSTR                      ;;count byte and string
-    vvCODE .set $                   ;;save code pointer
-ORG vvLEN                           ;;point to count byte
-    DB vvCODE - vvLEN - 1           ;;set count
-ORG vvCODE                          ;;restore code pointer
+    DW aaFUNC                       ; function
+    vvLEN .set $                    ; save address of count byte
+    DB 0,aaSTR                      ; count byte and string
+    vvCODE .set $                   ; save code pointer
+ORG vvLEN                           ; point to count byte
+    DB vvCODE - vvLEN - 1           ; set count
+ORG vvCODE                          ; restore code pointer
     ; .align 2
 .endm
 
 .macro hCODE, aaLEX, aaNAME, aaLABEL
-    .align 2                                         ;;force to cell boundary
-aaLABEL:                                              ;;assembly label
+    .align 2                                         ; force to cell boundary
+aaLABEL:                                              ; assembly label
 .endm
 
 .macro hCOLON, aaLEX, aaNAME, aaLABEL

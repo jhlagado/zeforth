@@ -100,7 +100,7 @@ mCOLON  IMEDD+1,'(',PAREN
 
 ;   \           ( -- )
 ;               Ignore following text till the end of line.
-mCOLON  IMEDD+1,'||',BKSLA
+mCOLON  IMEDD+1, $5C, BKSLA
     DW      NTIB,AT,INN,STORE,EXIT
 ;   CHAR        ( -- c )
 ;               Parse next word and return its first character.
