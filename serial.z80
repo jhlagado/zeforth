@@ -18,6 +18,7 @@ waitForChar:
     LD A,(serBufUsed)
     CP $00
     JR Z, waitForChar
+RXA1:
     PUSH HL
     LD HL,(serRdPtr)
     INC HL
@@ -51,16 +52,7 @@ conout1:
     OUT ($81),A  ; Output the character
     RET
 
-CKINCHAR: 
+QRXA: 
     LD A,(serBufUsed)
     CP $0
-    RET
-
-PRINTSZ:  
-    LD A,(HL)  ; Get character
-    OR A  ; Is it $00 ?
-    RET Z  ; Then RETurn on terminator
-    CALL TXA  ; Print it
-    INC HL  ; Next Character
-    JR PRINTSZ  ; Continue until $00
     RET

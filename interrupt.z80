@@ -31,6 +31,7 @@ notWrap:        LD       (serInPtr),HL
                 OUT      ($80),A
 rts0:           POP      HL
                 POP      AF
+                LD IY,   NEXT_STEP
                 EI
                 RETI
 

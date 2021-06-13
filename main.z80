@@ -9,36 +9,36 @@ TESTMODE    EQU     0
 RESET:      JP      INIT                    
 
             .ORG    $08 
-RST08:      LD HL,(vRST08)
-            JP (HL)
+RST08:      LD IY,(vRST08)
+            JP (IY)
             
             .ORG    $10 
-RST10:      LD HL,(vRST10)
-            JP (HL)
+RST10:      LD IY,(vRST10)
+            JP (IY)
             
             .ORG    $18 
-RST18:      LD HL,(vRST18)
-            JP (HL)
+RST18:      LD IY,(vRST18)
+            JP (IY)
             
             .ORG    $20 
-RST20:      LD HL,(vRST20)
-            JP (HL)
+RST20:      LD IY,(vRST20)
+            JP (IY)
             
             .ORG    $28 
-RST28:      LD HL,(vRST28)
-            JP (HL)
+RST28:      LD IY,(vRST28)
+            JP (IY)
             
             .ORG    $30 
-RST30:      LD HL,(vRST30)
-            JP (HL)
+RST30:      LD IY,(vRST30)
+            JP (IY)
             
             .ORG    $38 
-RST38:      LD HL,(vINT)
-            JP (HL)
+RST38:      LD IY,(vINT)
+            JP (IY)
 
             .ORG    $66 
-RST66:      LD HL,(vNMI)
-            JP (HL)
+RST66:      LD IY,(vNMI)
+            JP (IY)
 INIT:                
             LD HL, serialInt
             LD (vINT),HL
@@ -54,7 +54,7 @@ INIT:
             LD IY, NEXT_STEP
 
             LD BC, -1                  ; empty stack marker
-            JP KOLD 
+            JP HI 
 
             IF TESTMODE 
             JP TESTS_START 
@@ -88,6 +88,8 @@ VVCODE      .SET    $
             .INCLUDE "core-user.z80" 
             .INCLUDE "core-utils.z80" 
 
+LASTN       EQU     vvNAME+4             ;last name address
+
             .ORG    END_ROM 
             .ORG    START_RAM 
 
@@ -106,5 +108,4 @@ DONE:       .CSTR   "Done!\r\n"
             .INCLUDE "variables.z80" 
 
             .END     
-
 

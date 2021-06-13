@@ -29,12 +29,12 @@ mCODE   3,'!IO', STOIO ;
 ;               Return input character and true, or a false if no input.
 mCODE	3, '?RX', QRX
     push BC
-    call CKINCHAR
+    call QRXA
     jr nz, QRX1
     ld BC, FALSEE
     jr QRX2
 QRX1:
-    call RXA
+    call RXA1
     LD C,A
     LD B,0
     PUSH BC
@@ -60,6 +60,9 @@ mCOLON  4,'?KEY',QKEY
 mCOLON  3,'KEY',KEY
 KEY1:
     DW QKEY
+    DW DUPP, QBRAN, KEY2
+    ; DW DOLIT, $22, EMIT
+KEY2:    
     DW QBRAN,KEY1
     DW EXIT
 
@@ -111,14 +114,17 @@ TYPE2:
     DW      DONXT,TYPE1
     DW      DROP,EXIT
 
-;   TYPECSTR    ( cstr -- )
+;   TYPEZ    ( cstr -- )
 ;   Similar to TYPE but prints C null terminated strings
-mCODE	3,'TYPESZ',TYPESZ
-    ld H,B
-    ld L,C
-    call PRINTSZ
-    pop BC
-    mNEXT
+mCOLON	4,'TYPEZ',TYPEZ
+TYPEZ1: 
+    DW DUPP,CAT
+    DW DUPP,QBRAN,TYPEZ2
+    DW EMIT
+    DW DOLIT,1,PLUS
+    DW BRAN,TYPEZ1
+TYPEZ2: 
+    DW DROP,EXIT
 
 ;   CR          ( -- )
 ;               Output a carriage return and a line feed.

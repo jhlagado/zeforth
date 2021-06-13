@@ -6,19 +6,19 @@ UZERO:
     defRZERO:           DW RPP                  ; RP0
     defTQKEY:           DW QRX                  ; '?KEY
     defTEMIT:           DW TXSTO                ; 'EMIT
-    defTEXPE:           DW 0                    ; 'EXPECT
-    defTTAP:            DW 0                    ; 'TAP
+    defTEXPE:           DW ACCEP                ; 'EXPECT
+    defTTAP:            DW KTAP                 ; 'TAP
     defTECHO:           DW TXSTO                ; 'ECHO
-    defTPROM:           DW 0                    ; 'PROMPT
-    defBASE:            DW 0                    ; BASE
+    defTPROM:           DW DOTOK                ; 'PROMPT
+    defBASE:            DW BASEE                    ; BASE
     defTEMP:            DW 0                    ; tmp
     defSPAN:            DW 0                    ; SPAN
     defINN:             DW 0                    ; >IN
     defNTIB:            DW 0                    ; #TIB
     defTIB:             DW TIBB                 ; TIB
     defCSP:             DW 0                    ; CSP
-    defTEVAL:           DW 0                    ; 'EVAL
-    defTNUMB:           DW 0                    ; 'NUMBER
+    defTEVAL:           DW INTER                ; 'EVAL
+    defTNUMB:           DW NUMBQ                 ; 'NUMBER
     defHLD:             DW 0                    ; HLD
     defHANDL:           DW 0                    ; HANDLER
     defCNTXT:           DW 0                    ; CONTEXT pointer
@@ -27,11 +27,9 @@ UZERO:
     defVOCABLP:         DW 0                    ; vocabulary link pointer ???
     defCP:              DW CPP                  ; CP  for runing phase on RAM
     defNP:              DW NPP                  ; NP  for runing phase on RAM
-    defLAST:            DW 0                    ; LAST
-    defVFRTH:           DW 0                    ; FORTH   \ mullti-user ???
+    defLAST:            DW LASTN                ; LAST
+    defVFRTH:           DW LASTN                    ; FORTH   \ mullti-user ???
     defVOCABL:          DW 0                    ; vocabulary link       ???
     defCOLD             DW 0                    ; 'COLD'
 ULAST:
 END_DEFAULTS:
-
-

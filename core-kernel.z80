@@ -1,9 +1,13 @@
-hCOLON	4,'KOLD',KOLD
+hCOLON	4,'HI',HI
     DW  STOIO
-    ; DW	DOLIT, 65, EMIT
-    DW  DOLIT, HELLO, COUNT, TYPEE
+    DW  DOLIT, HELLO
+    DW  TYPEZ
+    DW  KEY
+    DW  EMIT
+    DW  DOLIT, HELLO
+    DW  TYPEZ
     DW	QUIT
-HELLO: .pstr "Hello Forth! \r\n"
+HELLO: .cstr "Hello Forth! \r\n"
 
 NEXT_STEP:
 	LD	E,(HL)	                    ; 7t
@@ -65,5 +69,5 @@ hCODE	COMPO+6,'branch', BRAN
 ;   THROW    ( cstr -- )
 ;   Prints string message and returns TODO: restart Forth interpreter QUIT
 mCOLON	5,'THROWX',THROWX
-	DW  TYPESZ, EXIT
+	DW  TYPEZ, EXIT
 
