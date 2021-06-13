@@ -131,13 +131,6 @@ TYPEZ2:
 mCOLON	2,'CR',CR
     DW	DOLIT,CRR,EMIT,DOLIT,LFF,EMIT,EXIT
 
-;   do$         ( -- a )
-;               Return the address of a compiled string.
-mCOLON  COMPO+3,'do$',DOSTR
-    DW      RFROM,RAT,RFROM,COUNT,PLUS
-    DW      ALGND,TOR,SWAP,TOR,EXIT
-
-
 ;   $"|         ( -- a )
 ;               Run time routine compiled by $". Return address of a compiled string.
 hCOLON  COMPO+3,'$||',STRQP

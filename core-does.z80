@@ -44,7 +44,13 @@ hCOLON  2, 'UP', UP
 ;   doUSER      ( -- a )
 ;   Run time routine for user variables.
 hCOLON  COMPO+6,'doUSER',DOUSE
-    DW RFROM, AT, UP, AT, PLUS, EXIT
+    DW  RFROM, AT, UP, AT, PLUS, EXIT
+    
+;   do$         ( -- a )
+;               Return the address of a compiled string.
+hCOLON  COMPO+3,'do$',DOSTR
+    DW  RFROM,RAT,RFROM,COUNT,PLUS
+    DW  ALGND,TOR,SWAP,TOR,EXIT
 
 ;   EXIT	( -- ) ( R: nest-sys -- )	\ CORE
 ;	Return control to the calling definition.
@@ -55,78 +61,10 @@ mCODE	COMPO+4, 'EXIT', EXIT
 	INC	IX
     mNEXTHL
     
-;   doDO	( n1|u1 n2|u2 -- ) ( R: -- n1 n2-n1-max_negative )
-;		Run-time funtion of DO.
-;
-;   : doDO	>R max-negative + R> OVER - SWAP R> SWAP >R SWAP >R >R ;
-
-hCOLON	COMPO+4,'doDO',DoDO
-	DW	ToR,DOLIT,MaxNegative,Plus,RFrom
-	DW	OVER,SUBB,SWAP,RFrom,SWAP,ToR,SWAP,ToR,ToR,EXIT
-
-; ;   doLOOP	( -- ) ( R: loop-sys1 -- | loop-sys2 )
-; ;		Run time routine for LOOP.
-
-; hCODE	COMPO+6,'doLOOP',DoLOOP
-; 	PUSH IX	        ; 15t
-; 	POP	HL	        ; 10t
-; 	INC	(HL)	    ; 11t
-; 	JR Z,DOLOOP2	; 12/7t a fast dec is ok, only
-; DOLOOP1: 	
-;     LD	A,(DE)	    ; 7t go back to the loop
-; 	LD	L,A	        ; 4t
-; 	INC	DE	        ; 6t
-; 	LD	A,(DE)	    ; 7t
-; 	LD	H,A	        ; 4t
-; 	mNEXTHL
-; DOLOOP2: 	
-;     INC	HL	        ; 6t
-; 	INC	(HL)	    ;11t
-; 	JP PO,DOLOOP1   ;10/7t ?loop end
-; 	EX	DE,HL	    ; 4t yes,continue past the BRAN offset
-; 	LD	DE,4	    ;10t clear return stack
-; 	ADD IX,DE	    ;15h
-; 	INC	HL	        ; 6t
-; 	INC	HL	        ; 6t
-; 	mNEXTHL
-
-; ;   do+LOOP	( n -- ) ( R: loop-sys1 -- | loop-sys2 )
-; ;		Run time routine for +LOOP.
-
-; hCODE	COMPO+7,'do+LOOP',DoPLOOP
-; 	POP	HL	        ;10t this will be the new TOS
-; 	PUSH	BC	    ;11t
-; 	LD	B,H	        ; 4t
-; 	LD	C,L	        ; 4t
-; 	EXX		        ; 4t
-; 	POP	BC	        ;10t old TOS = loop increment
-; 	LD L,(IX+0)     ;19t
-; 	LD H,(IX+1)     ;19t
-; 	OR	A	        ; 4t clear carry
-; 	ADC HL,BC	    ;15t
-; 	JP PE,DOPLP1	;10/7t ?loop end
-; 	LD (IX+0),L     ;19t   no, go back
-; 	LD (IX+1),H     ;19t
-; 	EXX		        ; 4t
-; 	LD	A,(DE)	    ; 7t go back to the loop
-; 	LD	L,A	        ; 4t
-; 	INC	DE	        ; 6t
-; 	LD	A,(DE)	    ; 7t
-; 	LD	H,A	        ; 4t
-; 	mNEXTHL
-; DOPLP1:		
-;     LD	BC,4	    ;10t clear return stack
-; 	ADD IX,BC	    ;15h
-; 	EXX		        ; 4t
-; 	INC	DE	        ; 6t yes,continue past the BRAN offset
-; 	INC	DE	        ; 6t
-; 	mNEXT
-
 ;   next        ( -- )
 ;               Run time code for the single index loop.
 ;               : next ( -- ) \ hilevel model
 ;                 r> r> dup if 1 - >r @ >r exit then drop cell+ >r ;
-
 mCODE   COMPO+4,'next',DONXT
     PUSH IX
     POP HL                              ; load rp into HL

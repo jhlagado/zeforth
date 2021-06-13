@@ -1,4 +1,4 @@
 ; GREETING:       .cstr   "Type something\r\n"
 
-ERR_DIVZERO   	.cstr	"DIVZERO"      ;-10
-ERR_OUTOFRANGE  .cstr	"OUTOFRANGE"   ;-11
+ERR_DIVZERO   	.cstr	"DIV BY ZERO"      ;-10
+ERR_OUTOFRANGE  .cstr	"OUT OF RANGE"   ;-11

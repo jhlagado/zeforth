@@ -212,7 +212,7 @@ mCOLON  5,'ABORT',ABORT
 ;   abort"      ( f -- )
 ;               Run time routine of ABORT" . Abort with a message.
 
-mCOLON  COMPO+6,'abort|',ABORQ
+hCOLON  COMPO+6,'abort|',ABORQ
     DW      QBRAN,ABOR1             ;text flag
     DW      DOSTR,THROW             ;pass error string
 ABOR1:          

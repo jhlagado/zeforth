@@ -190,9 +190,4 @@ mCOLON  5,'PACK$',PACKS
 ;   ALIGNED     ( b -- a )
 ;               Align address to the cell boundary.
 mCOLON  7,'ALIGNED', ALGND
-    DW      DUPP,DOLIT,0,DOLIT,CELLL
-    DW      UMMOD,DROP,DUPP
-    DW      QBRAN,ALGN1
-    DW      DOLIT,CELLL,SWAP,SUBB
-ALGN1:          
-    DW      PLUS,EXIT
+    DW      EXIT

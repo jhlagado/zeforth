@@ -46,7 +46,7 @@ mUSER   4,'BASE',BASE
 ;   tmp         ( -- a )
 ;               A temporary storage location used in parse and find.
 
-mUSER   COMPO+3,'tmp',TEMP
+hUSER   COMPO+3,'tmp',TEMP
 
 ;   SPAN        ( -- a )
 ;               Hold character count received by EXPECT.
