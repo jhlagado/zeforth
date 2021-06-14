@@ -1,0 +1,16 @@
+mCOLON 6,"TEST1",TEST1 
+    DW  TESSTRT
+    
+    ;  T{ 1 2 drop }T 1 ==
+    DW  TESLBR,DOLIT,1,DOLIT,2,DROP,TESRBR
+    DW  DOLIT,1,TESEQ   
+
+    ;  T{ 1 dup }T 1 1 ==
+    DW  TESLBR,DOLIT,1,DUP,TESRBR
+    DW  DOLIT,1,DOLIT,1,TESEQ
+
+    ;  T{ 2 1 swap }T 1 2 ==
+    DW  TESLBR,DOLIT,1,DOLIT,2,SWAP,TESRBR
+    DW  DOLIT,2,DOLIT,1,TESEQ
+    
+    DW  TESEND                      

@@ -1,8 +1,12 @@
 ; utility words
 ; report the test number to a numeric output device
 mCOLON 2,"T.",TESDOT
-    DW  DOT
-    DW  EXIT                      
+    ; DW  DOT
+    ; DW  EXIT                      
+    DW  QBRAN,TESDOT1
+    DW  DOLIT,$58,EMIT,EXIT                      
+TESDOT1:
+    DW  DOLIT,$4F,EMIT,EXIT                      
 
 ; halt the system
 hCOLON 4,"halt",TESHALT
@@ -14,7 +18,7 @@ hCOLON 4,"halt",TESHALT
 ;  swap 1+ xor
 ; ;
 hCOLON 4,"hash",TESHASH
-    DW  SWAP,INCR,XORR
+    DW  SWAP,ONEP,XORR
     DW  EXIT                      
 
 ; hash n items from the stack and return the hash code
@@ -34,7 +38,7 @@ hCOLON 6,"hash-n",TESHASHN
 TESHASHN1:
     DW  DUPP,DOLIT,0,GREAT,QBRAN,TESHASHN2
     DW  SWAP,RFROM,TESHASH,TOR
-    DW  DECR,BRAN,TESHASHN1 
+    DW  ONEM,BRAN,TESHASHN1 
 TESHASHN2:
     DW  DROP,RFROM
     DW  EXIT                      
@@ -51,7 +55,7 @@ mCOLON 6,"Tstart",TESSTRT
 ;  Tcount @ 1+ dup T. Tcount !
 ;  depth Tdepth !
 mCOLON 2,"T{",TESLBR 
-    DW  TESCNT,AT,INCR,DUPP,TESDOT,TESCNT,STORE
+    DW  TESCNT,AT,ONEP,DUPP,TESDOT,TESCNT,STORE
     DW  DEPTH,TESDPTH,STORE
     DW  EXIT                      
 

@@ -172,7 +172,7 @@ DOT1:
 ;   .(          ( -- )
 ;               Output following string up to next ) .
 mCOLON  IMEDD+2,'.(',DOTPR
-    DW      DOLIT,')',PARSE,TYPEE,EXIT
+    DW      DOLIT,$29,PARSE,TYPEE,EXIT  ; $29 = ')'
 
 ;   ?           ( a -- )
 ;               Display the contents in a memory cell.

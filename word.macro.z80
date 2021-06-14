@@ -65,16 +65,10 @@ aaLABEL:                                              ; assembly label
 
 .macro mNEXTHL
     JP (IY)
-; 	LD	E,(HL)	                    ; 7t
-; 	INC	HL	                        ; 6t
-; 	LD	D,(HL)	                    ; 7t
-; 	INC	HL	                        ; 6t
-; 	EX	DE,HL	                    ; 4t
-; 	JP	(HL)	                    ; 4t
 .endm   	                        ; 34t
 
 .macro mNEXT
 	EX	DE,HL	                    ; 4t
-    mNEXTHL                         ; 34t
+    JP (IY)
 .endm   	                        ; 38t
 

@@ -190,4 +190,5 @@ mCOLON  5,'PACK$',PACKS
 ;   ALIGNED     ( b -- a )
 ;               Align address to the cell boundary.
 mCOLON  7,'ALIGNED', ALGND
+    DW      ONEP,TWSLA,TWSTA
     DW      EXIT

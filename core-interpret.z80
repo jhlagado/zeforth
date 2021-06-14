@@ -2,7 +2,7 @@
 ;               Convert a character to its numeric value. A flag indicates success.
 
 hCOLON  6,'DIGIT?',DIGTQ
-    DW      TOR,DOLIT,'0',SUBB
+    DW      TOR,DOLIT,$30,SUBB             ; $30 = '0'
     DW      DOLIT,9,OVER,LESS
     DW      QBRAN,DGTQ1
     DW      DOLIT,7,SUBB
@@ -14,12 +14,12 @@ DGTQ1:
 ;               Convert a number string to integer. Push a flag on tos.
 hCOLON  7,'NUMBER?',NUMBQ
     DW      BASE,AT,TOR,DOLIT,0,OVER,COUNT
-    DW      OVER,CAT,DOLIT,'$',EQUAL
+    DW      OVER,CAT,DOLIT,$24,EQUAL        ; $24 = '$"
     DW      QBRAN,NUMQ1
     DW      HEX,SWAP,DOLIT,1,PLUS
     DW      SWAP,DOLIT,1,SUBB
 NUMQ1:          
-    DW      OVER,CAT,DOLIT,'-',EQUAL,TOR
+    DW      OVER,CAT,DOLIT,$2D,EQUAL,TOR    ;$2D = '-'
     DW      SWAP,RAT,SUBB,SWAP,RAT,PLUS,QDUP
     DW      QBRAN,NUMQ6
     DW      DOLIT,1,SUBB,TOR
@@ -96,7 +96,7 @@ mCOLON  5,'PARSE',PARSE
 ;               Ignore following string up to next ) . A comment.
 
 mCOLON  IMEDD+1,'(',PAREN
-    DW      DOLIT,')',PARSE,DDROP,EXIT
+    DW      DOLIT,$29,PARSE,DDROP,EXIT          ; $29 = ')'
 
 ;   \           ( -- )
 ;               Ignore following text till the end of line.

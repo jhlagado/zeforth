@@ -3,7 +3,7 @@
 hCOLON  5,'DIGIT',DIGIT
     DW      DOLIT,9,OVER,LESS
     DW      DOLIT,7,ANDD,PLUS
-    DW      DOLIT,'0',PLUS,EXIT
+    DW      DOLIT,$30,PLUS,EXIT     ; $30 = '0'
 
 ;   EXTRACT     ( n base -- n c )
 ;               Extract the least significant digit from n.

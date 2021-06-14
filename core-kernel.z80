@@ -15,8 +15,9 @@ NEXT_STEP:
 	EX	DE,HL	                    ; 4t
 	JP	(HL)	                    ; 4t
 
-hCOLON	2,'HI2x',HI2x
+hCOLON	2,'HI',HI
     DW  STOIO
+    ; DW  DOLIT,1,DOLIT,0,DOLIT,1,UMMOD,TESDOT,TESDOT
     DW  DOLIT, HELLO
     DW  TYPEZ
     DW  KEY
@@ -28,13 +29,12 @@ HELLO: .cstr "Hello Forth! \r\n"
 
 ;   hi          ( -- )
 ;               Display the sign-on message of eForth.
-
-hCOLON  2,'hi',HI
+hCOLON  2,'hix',HIX
     DW      STOIO,CR                ;initialize I/O
     mDSTR   DOTQP,'eForth v'        ;model
     ; DW      BASE,AT,HEX             ;save radix
     ; DW      VERSN,BDIGS,DIG,DIG
-    ; DW      DOLIT,'.',HOLD
+    ; DW      DOLIT,$2E,HOLD          ; $2E = '.'
     ; DW      DIGS,EDIGS,TYPEE        ;format version number
     ; DW      BASE,STORE              ;restore radix
     DW  CR     
