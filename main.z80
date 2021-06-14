@@ -83,6 +83,7 @@ VVCODE      .SET    $
             .INCLUDE "core-stacks.z80" 
             .INCLUDE "core-user.z80" 
             .INCLUDE "core-utils.z80" 
+            .INCLUDE "tester.z80" 
 
 LASTN       EQU     vvNAME+4             ;last name address
 

@@ -328,3 +328,16 @@ mCOLON	5,'CELL-',CELLM
 mCOLON	5,'CELLS',CELLS
     DW  DOLIT,CELLL,STAR,EXIT
     
+    
+;;;;;  EXTRAS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+mCOLON  1,'>',GREAT
+    DW  SWAP,LESS,EXIT
+
+mCOLON  2,'1+',INCR
+    DW  DOLIT,1,PLUS,EXIT
+
+mCOLON  2,'1-',DECR
+    DW  DOLIT,1,SUBB,EXIT
+
+
