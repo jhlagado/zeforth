@@ -3,7 +3,7 @@
 
 INIT_IO:
     DI   ; Disable interrupts
-    LD HL, serBuf
+    LD HL, SERBUF
     LD (serInPtr), HL 
     LD (serRdPtr), HL  
     XOR A
@@ -14,29 +14,24 @@ INIT_IO:
     RET
 
 RXA:
-waitForChar: 
-    LD A,(serBufUsed)
-    CP $00
-    JR Z, waitForChar
-RXA1:
     PUSH HL
     LD HL,(serRdPtr)
     INC HL
     LD A,L  ; Only need to check low byte becasuse buffer<256 bytes
-    CP (serBuf+SER_BUFSIZE) & $FF
-    JR NZ, notRdWrap
-    LD HL,serBuf
-notRdWrap: 
+    CP (SERBUF+SER_BUFSIZE) & $FF
+    JR NZ, RXA1
+    LD HL,SERBUF
+RXA1: 
     DI
     LD (serRdPtr),HL
     LD A,(serBufUsed)
     DEC A
     LD (serBufUsed),A
     CP SER_EMPTYSIZE
-    JR NC,rts1
+    JR NC,RXA2
     LD A,RTS_LOW
     OUT ($80),A
-rts1:
+RXA2:
     LD A,(HL)
     EI
     POP HL
@@ -44,10 +39,10 @@ rts1:
 
 TXA:  
     PUSH AF  ; Store character
-conout1: 
+TXA1: 
     IN A,($80)  ; Status byte 
     BIT 1,A  ; Set Zero flag if still transmitting character 
-    JR Z,conout1 ; Loop until flag signals ready
+    JR Z,TXA1 ; Loop until flag signals ready
     POP AF  ; Retrieve character
     OUT ($81),A  ; Output the character
     RET

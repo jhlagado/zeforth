@@ -1,4 +1,4 @@
-serialInt:      PUSH     AF
+SER_INTR:      PUSH     AF
                 PUSH     HL
 
                 IN       A,($80)
@@ -16,9 +16,9 @@ serialInt:      PUSH     AF
 notFull:        LD       HL,(serInPtr)
                 INC      HL
                 LD       A,L                ; Only need to check low byte becasuse buffer<256 bytes
-                CP       (serBuf+SER_BUFSIZE) & $FF
+                CP       (SERBUF+SER_BUFSIZE) & $FF
                 JR       NZ, notWrap
-                LD       HL,serBuf
+                LD       HL,SERBUF
 notWrap:        LD       (serInPtr),HL
                 POP      AF
                 LD       (HL),A

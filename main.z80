@@ -40,7 +40,7 @@ RST38:      LD IY,(vINT)
 RST66:      LD IY,(vNMI)
             JP (IY)
 INIT:                
-            LD HL, serialInt
+            LD HL, SER_INTR
             LD (vINT),HL
             LD HL,SPP                  ; Setup Forth data stack
             LD SP,HL                   ; also used as return stack by interrupts etc
@@ -54,18 +54,14 @@ INIT:
             LD IY, NEXT_STEP
 
             LD BC, -1                  ; empty stack marker
-            JP HI 
+            LD HL,HI 
+            CALL CALL_FORTH
+            HALT
 
             IF TESTMODE 
             JP TESTS_START 
 
             ELSE     
-            ; LD      HL,GREETING 
-            ; CALL    PRINTSZ 
-LOOP:                
-            CALL    RXA 
-            CALL    TXA 
-            JP      LOOP 
             ENDIF    
 
             .INCLUDE "interrupt.z80" 

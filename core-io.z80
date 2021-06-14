@@ -34,7 +34,7 @@ mCODE	3, '?RX', QRX
     ld BC, FALSEE
     jr QRX2
 QRX1:
-    call RXA1
+    call RXA
     LD C,A
     LD B,0
     PUSH BC

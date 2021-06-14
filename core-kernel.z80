@@ -1,4 +1,21 @@
-hCOLON	2,'HI2',HI2
+; HL contains the xt of the word
+CALL_FORTH:
+	LD	DE,TRETURN_HERE	                
+	JP	(HL)	                 
+RETURN_HERE:
+    RET
+TRETURN_HERE:
+    DW RETURN_HERE
+    
+NEXT_STEP:
+	LD	E,(HL)	                    ; 7t
+	INC	HL	                        ; 6t
+	LD	D,(HL)	                    ; 7t
+	INC	HL	                        ; 6t
+	EX	DE,HL	                    ; 4t
+	JP	(HL)	                    ; 4t
+
+hCOLON	2,'HI2x',HI2x
     DW  STOIO
     DW  DOLIT, HELLO
     DW  TYPEZ
@@ -20,16 +37,17 @@ hCOLON  2,'hi',HI
     ; DW      DOLIT,'.',HOLD
     ; DW      DIGS,EDIGS,TYPEE        ;format version number
     ; DW      BASE,STORE              ;restore radix
-    DW      CR,EXIT     
+    DW  CR     
+HI1:
+    DW  KEY
+    DW  DUPP, EMIT
+    DW  DOLIT, $0D, EQUAL
+    ; DW  DROP, DOLIT, 0
+    DW  QBRAN, HI1
+    DW  DOLIT, HELLO
+    DW  TYPEZ
+    DW  CR,EXIT     
 
-
-NEXT_STEP:
-	LD	E,(HL)	                    ; 7t
-	INC	HL	                        ; 6t
-	LD	D,(HL)	                    ; 7t
-	INC	HL	                        ; 6t
-	EX	DE,HL	                    ; 4t
-	JP	(HL)	                    ; 4t
 
 mCOLON	4,'COLD',COLD
 COLD1:          

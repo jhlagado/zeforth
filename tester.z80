@@ -1,0 +1,90 @@
+; utility words
+; report the test number to a numeric output device
+mCOLON 2, "T.", TESDOT
+    DW  DOT
+    DW  EXIT                      
+
+; halt the system
+mCOLON 4, "HALT", TESHALT
+    DW  QUIT             
+
+; compute h1 by hashing x1 and h0
+; ( x1 h0 -- h1 )
+; : hash ( x1 h0 -- h1 )
+;  swap 1+ xor
+; ;
+mCOLON 4, "HASH", TESHASH
+    DW  SWAP, 
+    DW  DOLIT, 1, PLUS
+    DW  XOR
+    DW  EXIT                      
+
+; hash n items from the stack and return the hash code
+; ( x1 x2 ... xn n -- h )
+; : hash-n ( x1 x2 ... xn n -- h )
+;  0 >R
+;  BEGIN
+;   dup 0 >
+;  WHILE
+;   swap R> hash >R
+;   1-
+;  REPEAT
+;  drop R>
+; ;
+mCOLON 6, "hash-n", TESHASHN 
+    DW  DOLIT, 0, TOR
+TESHASHN1:
+    DW  DUPP, DOLIT, 0, GREATER, QBRAN, TESHASN2
+    DW  SWAP, RFROM, TESHASH, TOR
+    DW  DOLIT, 1, MINUS, BRAN, TESHASHN1 
+TESHASHN2:
+    DW  DROPP, RFROM
+    DW  EXIT                      
+
+; start testing
+; : Tstart
+;  0 Tcount !
+mCOLON 6, "Tstart", TESSTRT 
+    DW  DOLIT, 0, TESSCNT, STORE
+    DW  EXIT                      
+
+; start a unit test
+; : T{ ( -- )
+;  Tcount @ 1+ dup T. Tcount !
+;  depth Tdepth !
+mCOLON 2, "T{", TESLBR 
+    DW  TESCNT, AT, DOLIT, 1, PLUS, DUPP, TESDOT, TESCNT, STORE
+    DW  DEPTH, TESDPTH, STORE
+    DW  EXIT                      
+
+; finish a unit test,
+; : }T ( y1 y2 ... yn -- hy )
+;  depth Tdepth @ - ( y1 y2 ... yn Ny )
+;  hash-n ( hy )
+;  depth Tdepth ! ( hy )
+mCOLON 2, "}T", TESRBR 
+    DW  DEPTH, TESDPTH, AT, MINUS
+    DW  TESHASHN
+    DW  DEPTH, TESDPTH, STORE
+    DW  EXIT                      
+
+; compare actual output with expected output
+; : == ( hy x1 x2 ... xn -- )
+;  depth Tdepth @ - ( hy x1 x2 .. xn Nx )
+;  hash-n ( hy hx )
+;  = 0= IF halt THEN
+mCOLON 2, "==", TESEQ 
+    DW  DEPTH, TESDPTH, AT, MINUS
+    DW  TESHASHN
+    DW  EQUAL, QBRAN, TESEQ1
+    DW  TESHALT
+TESEQ1:    
+    DW  EXIT                      
+
+; signal end of testing
+; : Tend ( -- )
+;  65535 ( 0xFFFF) T.
+; ;
+mCOLON 4, "Tend", TESEND 
+    DW  0xFFFF, TESDOT
+    DW  EXIT                      

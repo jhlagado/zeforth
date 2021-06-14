@@ -1,44 +1,46 @@
 
                 DS DTS                  ; data stack size
-SPP:                                    ; SP0 grows down
+SPP:                    ; SP0 grows down
 TIBB:           
                 DS RTS                  ; return stack size
-RPP:                                    ; RP0 grows down (into TIBB)
-UPP:      
+RPP:                    ; RP0 grows down (into TIBB)
 
-varSZERO:       DW 0                    ; SP0
-varRZERO:       DW 0                    ; RP0
-varTQKEY:       DW 0                    ; '?KEY
-varTEMIT:       DW 0                    ; 'EMIT
-varTEXPE:       DW 0                    ; 'EXPECT
-varTTAP:        DW 0                    ; 'TAP
-varTECHO:       DW 0                    ; 'ECHO
-varTPROM:       DW 0                    ; 'PROMPT
-varBASE:        DW 0                    ; BASE
-varTEMP:        DW 0                    ; tmp
-varSPAN:        DW 0                    ; SPAN
-varINN:         DW 0                    ; >IN
-varNTIB:        DW 0                    ; #TIB
-varTIB:         DW 0                    ; TIB
-varCSP:         DW 0                    ; CSP
-varTEVAL:       DW 0                    ; 'EVAL
-varTNUMB:       DW 0                    ; 'NUMBER
-varHLD:         DW 0                    ; HLD
-varHANDL:       DW 0                    ; HANDLER
-varCNTXT:       DW 0                    ; CONTEXT pointer
-varVOCABS:      DW 0                    ; vocabulary stack    ???
-varCRRNT:       DW 0                    ; CURRENT pointer
-varVOCABLP:     DW 0                    ; vocabulary link pointer ???
-varCP:          DW 0                    ; CP  for runing phase on RAM
-varNP:          DW 0                    ; NP  for runing phase on RAM
-varLAST:        DW 0                    ; LAST
-varVFRTH:       DW 0                    ; FORTH   \ mullti-user ???
-varVOCABL:      DW 0                    ; vocabulary link       ???
-
+                .align $100
+SERBUF:         DS SER_BUFSIZE
 serInPtr:       DW 0
 serRdPtr:       DW 0
 serBufUsed:     DW 0
-serBuf:         DS SER_BUFSIZE
+
+UPP:      
+
+varSZERO:       DW 0    ; SP0
+varRZERO:       DW 0    ; RP0
+varTQKEY:       DW 0    ; '?KEY
+varTEMIT:       DW 0    ; 'EMIT
+varTEXPE:       DW 0    ; 'EXPECT
+varTTAP:        DW 0    ; 'TAP
+varTECHO:       DW 0    ; 'ECHO
+varTPROM:       DW 0    ; 'PROMPT
+varBASE:        DW 0    ; BASE
+varTEMP:        DW 0    ; tmp
+varSPAN:        DW 0    ; SPAN
+varINN:         DW 0    ; >IN
+varNTIB:        DW 0    ; #TIB
+varTIB:         DW 0    ; TIB
+varCSP:         DW 0    ; CSP
+varTEVAL:       DW 0    ; 'EVAL
+varTNUMB:       DW 0    ; 'NUMBER
+varHLD:         DW 0    ; HLD
+varHANDL:       DW 0    ; HANDLER
+varCNTXT:       DW 0    ; CONTEXT pointer
+varVOCABS:      DW 0    ; vocabulary stack    ???
+varCRRNT:       DW 0    ; CURRENT pointer
+varVOCABLP:     DW 0    ; vocabulary link pointer ???
+varCP:          DW 0    ; CP  for runing phase on RAM
+varNP:          DW 0    ; NP  for runing phase on RAM
+varLAST:        DW 0    ; LAST
+varVFRTH:       DW 0    ; FORTH   \ mullti-user ???
+varVOCABL:      DW 0    ; vocabulary link       ???
 
 VECTAB:
 vRST08:         DW 0
@@ -50,7 +52,10 @@ vRST30:         DW 0
 vINT:           DW 0
 vNMI            DW 0
 
-CPP:                              ; grows up
+TESCNT:         DW 0    ; the current test number
+TESDPTH:        DW 0    ; saved stack depth
+
+CPP:                    ; grows up
                 .ORG END_RAM - 2
-NPP:                               ; grows down
+NPP:                    ; grows down
 
