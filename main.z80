@@ -1,4 +1,4 @@
-            .ENGINE mycomputer 
+            ; .ENGINE mycomputer 
 
 TESTMODE    EQU     0 
 
@@ -83,26 +83,25 @@ VVCODE      .SET    $
             .INCLUDE "core-stacks.z80" 
             .INCLUDE "core-user.z80" 
             .INCLUDE "core-utils.z80" 
-            .INCLUDE "tester.z80" 
 
 LASTN       EQU     vvNAME+4             ;last name address
 
             .ORG    END_ROM 
             .ORG    START_RAM 
 
-            IF      TESTMODE 
-
-TESTS_START:         
-
-            LD      HL,DONE 
-            CALL    PRINTSZ 
-            HALT     
-
-DONE:       .CSTR   "Done!\r\n" 
-
-            ENDIF    
-
             .INCLUDE "variables.z80" 
-
+vvCODE .set CPP
+vvNAME .set NPP
+            
+; IF TESTMODE 
+            
+            .ORG CPP 
+            .INCLUDE "tester.z80" 
+TESTS_START:         
+;             LD HL,DONE 
+;             CALL PRINTSZ 
+;             HALT    
+; DONE:       .CSTR "Done!\r\n" 
+; ENDIF    
             .END     
 

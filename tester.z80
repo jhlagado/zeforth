@@ -1,6 +1,6 @@
 ; utility words
 ; report the test number to a numeric output device
-mCOLON 2,"T.",TESDOT
+hCOLON 2,"T.",TESDOT
     ; DW  DOT
     ; DW  EXIT                      
     DW  QBRAN,TESDOT1

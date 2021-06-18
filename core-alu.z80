@@ -47,7 +47,7 @@ mCODE	3, 'XOR', XORR
 ;   +           ( w w -- sum )
 ;               Add top two items.
 mCOLON	1,'+', PLUS
-    DW	UMPlus, DROP, EXIT
+    DW	UPLUS, DROP, EXIT
 
 ;   NOT         ( w -- w )
 ;               One's complement of tos.
@@ -63,7 +63,7 @@ mCOLON	6,'NEGATE',NEGAT
 ;               Two's complement of top double.
 mCOLON	7,'DNEGATE',DNEGA
 	DW	INVER, ToR, INVER
-	DW	DOLIT, 1, UMPlus
+	DW	DOLIT, 1, UPLUS
 	DW	RFrom, Plus, EXIT
 
 ;   -           ( n1 n2 -- n1-n2 )
@@ -130,7 +130,7 @@ mCOLON	6,'WITHIN',WITHI
 
 ;   UM+         ( w w -- w cy )
 ;               Add two numbers, return the sum and carry flag.
-hCODE	3,'um+',UMPlus
+hCODE	3,'um+',UPLUS
     POP	HL	            ;10t
 	ADD	HL,BC	        ;11t
 	PUSH	HL	        ;11t
@@ -141,89 +141,115 @@ UMP2:
 UMP1:		
     mNEXT
 
-; UM/MOD      ( udl udh u -- ur uq )
-; Unsigned divide of a double by a single. Return mod and quotient.
-; Note: Less range than eForth because most significant word discarded TODO: fix 
-mCOLON  6,'UM/MOD',UMMOD
-    DW  SWAP,DROP, UMSLMOD2, EXIT
+;   UM/MOD      ( udl udh u -- ur uq )
+;               Unsigned divide of a double by a single. Return mod and quotient.
 
-; UM/MOD2	( ud u1 -- u2 u3 )		
-; Unsigned division of a double-cell number ud by a single-cell
-; number u1. Return remainder u2 and quotient u3.
-; Note: Less range than eForth TODO: fix 
-mCODE	6,'UM/MOD2',UMSLMOD2
-    LD	A,B
-	OR	C
-	JR	Z,UMMOD2	;?zero divisor
-UMMOD11: 	
-    PUSH	BC
-	EXX
-	POP	BC
-	POP	HL
-	POP	DE
-	LD	A,L
-	SUB	C
-	LD	A,H
-	SBC	A,B
-	JR	NC,UMMOD1	;?too big
-UMMOD12: 	
-    LD	A,H
-    LD	H,L
-	LD	L,D
-	LD	D,8
-	PUSH	DE
-	CALL	UMMOD3
-	POP	DE
-	PUSH	HL
-	LD	L,E
-	CALL	UMMOD3
-	LD	D,A
-	LD	E,H
-	POP	BC
-	LD	H,C
-	PUSH	DE
-	PUSH	HL
-	EXX
-	POP	BC
-	mNEXT
-UMMOD2:		
-    LD	BC,ERR_DIVZERO ; divide by 0
-	JP	THROWX
-UMMOD1:		
-    LD	BC,ERR_OUTOFRANGE ; result out of range
-	JP	THROWX
-UMMOD4:		
-    LD	E,A
-	LD	A,H
-	SUB	C
-	LD	H,A
-	LD	A,E
-	SBC	A,B
-	JR	NC,UMMOD5
-UMMOD13: 	
-    LD	A,H
-	ADD	A,C
-	LD	H,A
-	LD	A,E
-	DEC	D
-	RET	Z
-UMMOD3:		
-    ADD	HL,HL
-	RLA
-	JR	NC,UMMOD4
-UMMOD14: 	
-    LD	E,A
-	LD	A,H
-	SUB	C
-	LD	H,A
-	LD	A,E
-	SBC	A,B
-UMMOD5:		
-    INC	L
-	DEC	D
-	JR	NZ,UMMOD3
-UMMOD15: 	
-    RET
+mCOLON  6,'UM/MOD',UMMOD
+    DW      DDUP,ULESS
+    DW      QBRAN,UMM4
+    DW      NEGAT,DOLIT,15,TOR
+UMM1:           
+    DW      TOR,DUPP,UPLUS
+    DW      TOR,TOR,DUPP,UPLUS
+    DW      RFROM,PLUS,DUPP
+    DW      RFROM,RAT,SWAP,TOR
+    DW      UPLUS,RFROM,ORR
+    DW      QBRAN,UMM2
+    DW      TOR,DROP,DOLIT,1,PLUS,RFROM
+    DW      BRAN,UMM3
+UMM2:           
+    DW      DROP
+UMM3:           
+    DW      RFROM
+    DW      DONXT,UMM1
+    DW      DROP,SWAP,EXIT
+UMM4:           
+    DW      DROP,DDROP
+    DW      DOLIT,-1,DUPP,EXIT      ;overflow, return max
+
+; ; UM/MOD      ( udl udh u -- ur uq )
+; ; Unsigned divide of a double by a single. Return mod and quotient.
+; ; Note: Less range than eForth because most significant word discarded TODO: fix 
+; mCOLON  6,'UM/MOD',UMMOD
+;     DW  SWAP,DROP, UMSLMOD2, EXIT
+
+; ; UM/MOD2	( ud u1 -- u2 u3 )		
+; ; Unsigned division of a double-cell number ud by a single-cell
+; ; number u1. Return remainder u2 and quotient u3.
+; ; Note: Less range than eForth TODO: fix 
+; mCODE	6,'UM/MOD2',UMSLMOD2
+;     LD	A,B
+; 	OR	C
+; 	JR	Z,UMMOD2	;?zero divisor
+; UMMOD11: 	
+;     PUSH	BC
+; 	EXX
+; 	POP	BC
+; 	POP	HL
+; 	POP	DE
+; 	LD	A,L
+; 	SUB	C
+; 	LD	A,H
+; 	SBC	A,B
+; 	JR	NC,UMMOD1	;?too big
+; UMMOD12: 	
+;     LD	A,H
+;     LD	H,L
+; 	LD	L,D
+; 	LD	D,8
+; 	PUSH	DE
+; 	CALL	UMMOD3
+; 	POP	DE
+; 	PUSH	HL
+; 	LD	L,E
+; 	CALL	UMMOD3
+; 	LD	D,A
+; 	LD	E,H
+; 	POP	BC
+; 	LD	H,C
+; 	PUSH	DE
+; 	PUSH	HL
+; 	EXX
+; 	POP	BC
+; 	mNEXT
+; UMMOD2:		
+;     LD	BC,ERR_DIVZERO ; divide by 0
+; 	JP	THROWX
+; UMMOD1:		
+;     LD	BC,ERR_OUTOFRANGE ; result out of range
+; 	JP	THROWX
+; UMMOD4:		
+;     LD	E,A
+; 	LD	A,H
+; 	SUB	C
+; 	LD	H,A
+; 	LD	A,E
+; 	SBC	A,B
+; 	JR	NC,UMMOD5
+; UMMOD13: 	
+;     LD	A,H
+; 	ADD	A,C
+; 	LD	H,A
+; 	LD	A,E
+; 	DEC	D
+; 	RET	Z
+; UMMOD3:		
+;     ADD	HL,HL
+; 	RLA
+; 	JR	NC,UMMOD4
+; UMMOD14: 	
+;     LD	E,A
+; 	LD	A,H
+; 	SUB	C
+; 	LD	H,A
+; 	LD	A,E
+; 	SBC	A,B
+; UMMOD5:		
+;     INC	L
+; 	DEC	D
+; 	JR	NZ,UMMOD3
+; UMMOD15: 	
+;     RET
 
 ;   FM/MOD	( d n1 -- n2 n3 )		\ CORE
 ;		Signed floored divide of double by single. Return mod n2
